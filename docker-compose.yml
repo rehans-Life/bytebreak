@@ -1,0 +1,11 @@
+version: '3'
+
+include:
+  ./judge0/docker-compose.yml
+
+services:
+  api:
+    build: ./server
+    environment:
+      - DP_PASSWORD=$DP_PASSWORD
+      - DB_URI=$DP_URI
