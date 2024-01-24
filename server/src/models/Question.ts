@@ -1,7 +1,6 @@
 import { HydratedDocument, Model, Schema, Types, model } from 'mongoose'
 import slugify from 'slugify'
 import Language from './Language'
-import { ITestCase } from './TestCase'
 
 export enum ParamType {
   Boolean = 'Boolean',
@@ -18,7 +17,6 @@ interface IQuestion {
   slug: string
   description: string
   difficulty: 'easy' | 'medium' | 'hard'
-  status: 'todo' | 'solved' | 'attempted'
   config: QuestionConfig
   accepted: number
   submissions: number
@@ -41,7 +39,14 @@ export interface QuestionConfig {
   returnType: ParamType
   params: {
     name: string
-    type: ParamType
+    type:
+      | 'Boolean'
+      | 'String'
+      | 'Integer'
+      | 'Integer[]'
+      | 'String[]'
+      | 'Integer[][]'
+      | 'String[][]'
   }[]
 }
 
@@ -69,6 +74,7 @@ const QuestionConfigSchema = new Schema<QuestionConfig>({
         },
         type: {
           enum: Object.values(ParamType),
+          default: 'String',
         },
       },
     ],
@@ -87,8 +93,12 @@ const QuestionSchema = new Schema<IQuestion, QuestionModel, IQuestionMethods>(
       type: String,
     },
     difficulty: {
-      enum: ['easy', 'medium', 'hard'],
-      required: [true, 'Difficulty is required'],
+      type: String,
+      enum: {
+        values: ['easy', 'medium', 'hard'],
+        message: '{VALUE} difficulty is not supported',
+      },
+      default: 'easy',
     },
     description: {
       type: String,
@@ -134,6 +144,7 @@ QuestionSchema.pre('save', function (next) {
     lower: true,
     trim: true,
   })
+
   next()
 })
 

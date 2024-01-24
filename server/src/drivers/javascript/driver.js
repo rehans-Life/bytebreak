@@ -26,6 +26,8 @@ function main() {
     switch (param.type) {
       case 'Integer[]':
       case 'String[]':
+      case 'Integer[][]':
+      case 'String[][]':
         temp = JSON.parse(input)
         break
       case 'Integer':

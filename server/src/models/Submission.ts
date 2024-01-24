@@ -33,7 +33,8 @@ const SubmissionSchema = new Schema<ISubmission>(
       required: [true, 'Code is required for a submission'],
     },
     status: {
-      enum: ['Wrong Answer', 'Accepted'],
+      type: String,
+      enum: ['Wrong Answer', 'Accepted', 'Runtime Error'],
       default: 'Wrong Answer',
     },
     runtime: {
