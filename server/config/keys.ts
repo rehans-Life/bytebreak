@@ -1,5 +1,15 @@
 export default {
-    PORT: process.env.PORT,
-    NODE_ENV: process.env.NODE_ENV,
-    DB_URI: process.env.DB_URI!.replace("<password>", process.env.DB_PASSWORD!)
+  PORT: process.env.PORT,
+  NODE_ENV: process.env.NODE_ENV,
+  DB_URI: process.env.DB_URI!.replace('<password>', process.env.DB_PASSWORD!),
+  JWT_SECRET_KEY: process.env.JWT_SECRET_KEY,
+  JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN,
+  JWT_COOKIE_EXPIRES_IN: process.env.JWT_COOKIE_EXPIRES_IN,
+} as {
+  PORT: number | string
+  NODE_ENV: 'Development' | 'Production' | 'CI'
+  DB_URI: string
+  JWT_SECRET_KEY: string
+  JWT_EXPIRES_IN: string
+  JWT_COOKIE_EXPIRES_IN: string
 }

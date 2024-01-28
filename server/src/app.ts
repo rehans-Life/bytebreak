@@ -1,21 +1,31 @@
-import express, { Request, Response } from "express";
-import cors from "cors";
-import helmet from "helmet";
-import morgan from "morgan";
-import keys from "../config/keys";
+import express from 'express'
+import cors from 'cors'
+import helmet from 'helmet'
+import morgan from 'morgan'
+import cookieParser from 'cookie-parser'
+import keys from '../config/keys'
+import AppError from './utils/appError'
 
-const app = express();
+import userRoutes from './routes/userRoutes'
+import errorController from './controllers/errorController'
 
-app.use(cors());
-app.use(express.json());
-app.use(helmet());
+const app = express()
 
-if(keys.NODE_ENV === 'Development') {
-    app.use(morgan("dev"));
+app.use(cors())
+app.use(express.json())
+app.use(helmet())
+app.use(cookieParser())
+
+if (keys.NODE_ENV === 'Development') {
+  app.use(morgan('dev'))
 }
 
-app.get("/", async (_: Request, res: Response) => {
-    return res.status(200).send("Hi");
+app.use('/api/v1/users', userRoutes)
+
+app.use('*', (req, res, next) => {
+  return next(new AppError(`Route ${req.path} not found on the server`, 404))
 })
 
-export default app;
+app.use(errorController)
+
+export default app

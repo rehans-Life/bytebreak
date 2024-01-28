@@ -8,6 +8,6 @@ RUN npm install
 
 COPY . .
 
-RUN tsc
+RUN npx tsc
 
 CMD [ "npm", "run", "start:prod" ]

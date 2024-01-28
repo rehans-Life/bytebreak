@@ -1,25 +1,16 @@
 version: '3'
 
-include:
-  - ./judge0/docker-compose.yml
+# include:
+#   - ./judge0/docker-compose.yml
 
 services:
-  mongo:
-    image: mongo
-    restart: always
-    environment:
-      MONGO_INITDB_DATABASE: bytebreak_dev
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: rootdev123
   api:
     restart: always
+    env_file:
+      - ./server/.env
     build:
       context: ./server
       dockerfile: Dockerfile.dev
-    environment:
-      - PORT=4000
-      - DB_PASSWORD=rootdev123
-      - DB_URI=mongodb://root:<password>@mongo:27017
     ports:
       - 4000:4000
     volumes:

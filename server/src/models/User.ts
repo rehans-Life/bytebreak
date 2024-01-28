@@ -5,13 +5,18 @@ import bcrypt from 'bcrypt'
 export interface IUser {
   username: string
   email: string
-  password: string
+  password?: string
+  active: boolean
   role: 'admin' | 'user'
+  photo: string
   confirmPassword: undefined
 }
 
 export interface IUserMethods {
-  correctPassword: (a: string, b: string) => Promise<boolean>
+  correctPassword: (
+    candidatePassword: string,
+    currentPassword: string,
+  ) => Promise<boolean>
 }
 
 type UserModel = Model<IUser, {}, IUserMethods>
@@ -37,10 +42,22 @@ const UserSchema = new Schema<IUser, UserModel, IUserMethods>(
         message: 'Please provide a valid email for creating an account',
       },
     },
+    active: {
+      type: Boolean,
+      default: true,
+    },
     role: {
       type: String,
-      enum: { values: ['admin', 'user'], message: '{VALUE} role doesnt exist' },
+      enum: {
+        values: ['admin', 'user'],
+        message: "{VALUE} role doesn't exist",
+      },
       default: 'user',
+    },
+    photo: {
+      type: String,
+      default:
+        'https://firebasestorage.googleapis.com/v0/b/tesla-clone-a0f5d.appspot.com/o/avatars%2Fdefault.jpg?alt=media&token=0aa62cc6-2260-4ce6-a595-4ae5f809dad3',
     },
     password: {
       type: String,
@@ -64,10 +81,10 @@ const UserSchema = new Schema<IUser, UserModel, IUserMethods>(
 )
 
 UserSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) return
+  if (!this.isModified('password')) return next()
 
   this.confirmPassword = undefined
-  this.password = await bcrypt.hash(this.password, 12)
+  this.password = await bcrypt.hash(this.password ?? '', 12)
 
   next()
 })
