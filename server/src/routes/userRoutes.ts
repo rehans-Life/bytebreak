@@ -20,7 +20,7 @@ import { getOne } from '../controllers/handlerFactory'
 import User from '../models/User'
 import multer from 'multer'
 import {
-  filterUserImage,
+  filterImage,
   resizeUserImage,
   uploadPhoto,
 } from '../controllers/uploadController'
@@ -28,7 +28,7 @@ import {
 const storage = multer.memoryStorage()
 const upload = multer({
   storage,
-  fileFilter: filterUserImage,
+  fileFilter: filterImage,
 })
 
 const router = Router()

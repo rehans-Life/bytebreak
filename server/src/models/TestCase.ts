@@ -1,18 +1,18 @@
 import { Schema, Types, model } from 'mongoose'
 
 export interface ITestCase {
-  id: Types.ObjectId
-  question: Types.ObjectId
+  id: string
+  problem: Types.ObjectId
   input: string
   output: string
   sample: boolean
 }
 
 const TestCaseSchema = new Schema<ITestCase>({
-  question: {
+  problem: {
     type: Schema.Types.ObjectId,
-    ref: 'Question',
-    required: [true, 'Test case must be related to a question'],
+    ref: 'Problem',
+    required: [true, 'Test case must be related to a problem'],
   },
   input: {
     type: String,

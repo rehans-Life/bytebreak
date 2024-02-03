@@ -1,5 +1,6 @@
 import { HydratedDocument, Schema, Types, model } from 'mongoose'
 import Comment from './Comment'
+import AppError from '../utils/appError'
 
 export interface ILike {
   comment: Types.ObjectId
@@ -22,12 +23,15 @@ const LikeSchema = new Schema<ILike>(
   },
 )
 
-LikeSchema.pre('save', async function (next) {
+LikeSchema.post('save', async function (doc, next) {
   try {
-    const comment = await Comment.findById(this.comment)
+    const comment = await Comment.findById(doc.comment)
 
     if (!comment) {
-      throw new Error('There is question corresponding to the submission')
+      throw new AppError(
+        'There is no comment corresponding to the submission',
+        404,
+      )
     }
 
     comment.likes += 1
@@ -36,10 +40,11 @@ LikeSchema.pre('save', async function (next) {
     next()
   } catch (err) {
     next(
-      new Error(
+      new AppError(
         err instanceof Error && err?.message
           ? err.message
           : 'An error occured while liking the comment please try again',
+        500,
       ),
     )
   }
@@ -50,7 +55,10 @@ LikeSchema.post(/delete/i, async function (doc: HydratedDocument<ILike>, next) {
     const comment = await Comment.findById(doc)
 
     if (!comment) {
-      throw new Error('There is question corresponding to the submission')
+      throw new AppError(
+        'There is question corresponding to the submission',
+        404,
+      )
     }
 
     comment.likes -= 1
@@ -59,10 +67,11 @@ LikeSchema.post(/delete/i, async function (doc: HydratedDocument<ILike>, next) {
     next()
   } catch (err) {
     next(
-      new Error(
+      new AppError(
         err instanceof Error && err?.message
           ? err.message
           : 'An error occured while unliking the comment please try again',
+        500,
       ),
     )
   }

@@ -1,0 +1,11 @@
+FROM node:21-bookworm
+
+WORKDIR /usr/app
+
+COPY package.json .
+
+RUN npm run install
+
+COPY . .
+
+CMD [ "npm", "run", "dev" ]

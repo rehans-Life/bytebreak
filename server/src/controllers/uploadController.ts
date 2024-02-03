@@ -13,7 +13,7 @@ type MulterFilter = (
   callback: FileFilterCallback,
 ) => void
 
-export const filterUserImage: MulterFilter = (_, file, callback) => {
+export const filterImage: MulterFilter = (_, file, callback) => {
   if (!file.mimetype.startsWith('image')) {
     callback(new AppError('File should be an image', 400))
   }
@@ -32,6 +32,15 @@ export const resizeUserImage: RequestHandler = catchAsync(
     next()
   },
 )
+
+export const deleteFile: RequestHandler = catchAsync(async (req, res, next) => {
+  if (!req.body.path) {
+    throw new AppError(
+      'Must provide the file path in order to delete the file',
+      404,
+    )
+  }
+})
 
 export const uploadPhoto: RequestHandler = catchAsync(
   async (req, res, next) => {

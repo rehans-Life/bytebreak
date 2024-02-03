@@ -1,8 +1,9 @@
 import { Error, Schema, Types, model } from 'mongoose'
-import Question from './Question'
+import Problem from './Problem'
+import AppError from '../utils/appError'
 
 interface ISubmission {
-  question: Types.ObjectId
+  problem: Types.ObjectId
   user: Types.ObjectId
   language: Types.ObjectId
   code: string
@@ -16,9 +17,9 @@ interface ISubmission {
 
 const SubmissionSchema = new Schema<ISubmission>(
   {
-    question: {
+    problem: {
       type: Schema.Types.ObjectId,
-      ref: 'Question',
+      ref: 'Problem',
     },
     user: {
       type: Schema.Types.ObjectId,
@@ -60,24 +61,28 @@ const SubmissionSchema = new Schema<ISubmission>(
 
 SubmissionSchema.pre('save', async function (next) {
   try {
-    const question = await Question.findById(this.question)
+    const problem = await Problem.findById(this.problem)
 
-    if (!question)
-      throw new Error('There is question corresponding to the submission')
+    if (!problem)
+      throw new AppError(
+        'There is problem corresponding to the submission',
+        404,
+      )
 
-    question.submissions += 1
+    problem.submissions += 1
 
-    if (this.status === 'Accepted') question.accepted += 1
+    if (this.status === 'Accepted') problem.accepted += 1
 
-    await question.save()
+    await problem.save()
 
     next()
   } catch (err) {
     next(
-      new Error(
+      new AppError(
         err instanceof Error && err?.message
           ? err.message
           : 'An error occured while submitting the code please try again',
+        500,
       ),
     )
   }

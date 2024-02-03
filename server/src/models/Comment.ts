@@ -1,5 +1,5 @@
 import { Schema, Types, model } from 'mongoose'
-import Question from './Question'
+import Problem from './Problem'
 
 export interface IComment {
   parentId: Types.ObjectId
@@ -26,7 +26,7 @@ const CommentSchema = new Schema<IComment>(
       type: String,
       validate: {
         validator: async function (value: string): Promise<boolean> {
-          const parent = await Question.findById((this as any).parentId)
+          const parent = await Problem.findById((this as any).parentId)
 
           // If the is a solution to the question then it must have a title
           if (parent && !value && !value.length) return false

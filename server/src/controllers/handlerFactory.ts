@@ -2,8 +2,11 @@ import { RequestHandler } from 'express'
 import { Model } from 'mongoose'
 import catchAsync from '../utils/catchAsync'
 import AppError from '../utils/appError'
+import ApiFeatures from '../utils/apiFeatures'
 
-export const createOne: (model: Model<any>) => RequestHandler = (model) =>
+type FactoryHandler = (model: Model<any>) => RequestHandler
+
+export const createOne: FactoryHandler = (model) =>
   catchAsync(async (req, res, _) => {
     const doc = await model.create(req.body)
     return res.status(200).json({
@@ -12,7 +15,23 @@ export const createOne: (model: Model<any>) => RequestHandler = (model) =>
     })
   })
 
-export const getOne: (model: Model<any>) => RequestHandler = (model) =>
+export const getAll: FactoryHandler = (model) =>
+  catchAsync(async (req, res, next) => {
+    const feautres = new ApiFeatures(model.find(), req.query)
+      .paginate()
+      .sort()
+      .select()
+      .filter()
+
+    const docs = await feautres.query
+
+    return res.status(200).json({
+      status: 'success',
+      data: docs,
+    })
+  })
+
+export const getOne: FactoryHandler = (model) =>
   catchAsync(async (req, res, _) => {
     const doc = await model.findById(req.params.id)
 
@@ -24,7 +43,7 @@ export const getOne: (model: Model<any>) => RequestHandler = (model) =>
     })
   })
 
-export const updateOne: (model: Model<any>) => RequestHandler = (model) =>
+export const updateOne: FactoryHandler = (model) =>
   catchAsync(async (req, res, _) => {
     const doc = await model.findByIdAndUpdate(
       {
@@ -41,7 +60,7 @@ export const updateOne: (model: Model<any>) => RequestHandler = (model) =>
     })
   })
 
-export const deleteOne: (model: Model<any>) => RequestHandler = (model) =>
+export const deleteOne: FactoryHandler = (model) =>
   catchAsync(async (req, res, _) => {
     const doc = await model.findOneAndDelete({
       id: req.params.id,

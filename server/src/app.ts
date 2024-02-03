@@ -7,6 +7,7 @@ import keys from '../config/keys'
 import AppError from './utils/appError'
 
 import userRoutes from './routes/userRoutes'
+import generalRoutes from './routes/generalRoutes'
 import errorController from './controllers/errorController'
 
 const app = express()
@@ -21,6 +22,7 @@ if (keys.NODE_ENV === 'Development') {
 }
 
 app.use('/api/v1/users', userRoutes)
+app.use('/api/v1/general', generalRoutes)
 
 app.use('*', (req, res, next) => {
   return next(new AppError(`Route ${req.path} not found on the server`, 404))

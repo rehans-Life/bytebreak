@@ -1,5 +1,5 @@
 import { Model, Schema, model } from 'mongoose'
-import { DefaultConfiguration, QuestionConfig } from './Question'
+import { DefaultConfiguration, ProblemConfig } from './Problem'
 
 interface Types {
   Boolean: string
@@ -12,23 +12,23 @@ interface Types {
 }
 
 interface ILanguage {
-  name: 'JavaScript' | 'Python' | 'Typescript' | 'Dart' | 'Java' | 'C++'
+  name: 'Javascript' | 'Python' | 'Typescript' | 'Dart' | 'Java' | 'C++'
   types: Types
 }
 
 interface LanguageMethods {
-  buildCodeConfiguration: (config: QuestionConfig) => string
+  buildCodeConfiguration: (config: ProblemConfig) => string
 }
 
 interface LanguageModel extends Model<ILanguage, {}, LanguageMethods> {
   getDefaultConfigrations: (
-    config: QuestionConfig,
+    config: ProblemConfig,
   ) => Promise<DefaultConfiguration[]>
 }
 
 const LanguageSchema = new Schema<ILanguage, LanguageModel, LanguageMethods>({
   name: {
-    enum: ['JavaScript', 'Python', 'Typescript', 'Dart', 'Java', 'C++'],
+    enum: ['Javascript', 'Python', 'Typescript', 'Dart', 'Java', 'C++'],
     required: [true, 'The language name is required'],
     unique: true,
   },
@@ -48,11 +48,11 @@ const LanguageSchema = new Schema<ILanguage, LanguageModel, LanguageMethods>({
 
 LanguageSchema.method(
   'buildCodeConfiguration',
-  function (config: QuestionConfig) {
+  function (config: ProblemConfig) {
     let params
     const { funcName, returnType } = config
     switch (this.name) {
-      case 'JavaScript':
+      case 'Javascript':
         params = config.params.map(({ name }) => name.toLowerCase()).join(', ')
         return `function ${funcName}(${params}){\n}`
       case 'Python':
@@ -88,7 +88,7 @@ LanguageSchema.method(
 
 LanguageSchema.static(
   'getDefaultConfigrations',
-  async function (config: QuestionConfig): Promise<DefaultConfiguration[]> {
+  async function (config: ProblemConfig): Promise<DefaultConfiguration[]> {
     const languages = await Language.find()
     return languages.map((lang) => {
       return {

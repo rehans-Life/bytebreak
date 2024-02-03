@@ -12,12 +12,13 @@ export enum ParamType {
   MatrixString = 'String[][]',
 }
 
-interface IQuestion {
+interface IProblem {
   name: string
+  user: Types.ObjectId
   slug: string
   description: string
   difficulty: 'easy' | 'medium' | 'hard'
-  config: QuestionConfig
+  config: ProblemConfig
   accepted: number
   submissions: number
   acceptanceRate: number
@@ -26,15 +27,15 @@ interface IQuestion {
   sampleTestCases: { input: string; output: string }[]
 }
 
-interface IQuestionMethods {
+interface IProblemMethods {
   populateDefaultConfigurations: () => Promise<
-    HydratedDocument<IQuestion, IQuestionMethods>
+    HydratedDocument<IProblem, IProblemMethods>
   >
 }
 
-type QuestionModel = Model<IQuestion, {}, IQuestionMethods>
+type ProblemModel = Model<IProblem, {}, IProblemMethods>
 
-export interface QuestionConfig {
+export interface ProblemConfig {
   funcName: string
   returnType: ParamType
   params: {
@@ -56,7 +57,7 @@ export interface DefaultConfiguration {
   code: string
 }
 
-const QuestionConfigSchema = new Schema<QuestionConfig>({
+const ProblemConfigSchema = new Schema<ProblemConfig>({
   funcName: {
     type: String,
     required: [true, 'Function name is required'],
@@ -64,6 +65,7 @@ const QuestionConfigSchema = new Schema<QuestionConfig>({
   },
   returnType: {
     enum: Object.values(ParamType),
+    required: [true, 'Function return type is required'],
   },
   params: {
     minlength: [1, 'You should add atleast one parameter'],
@@ -73,6 +75,7 @@ const QuestionConfigSchema = new Schema<QuestionConfig>({
           type: String,
         },
         type: {
+          type: String,
           enum: Object.values(ParamType),
           default: 'String',
         },
@@ -81,13 +84,17 @@ const QuestionConfigSchema = new Schema<QuestionConfig>({
   },
 })
 
-const QuestionSchema = new Schema<IQuestion, QuestionModel, IQuestionMethods>(
+const ProblemSchema = new Schema<IProblem, ProblemModel, IProblemMethods>(
   {
     name: {
       type: String,
       unique: true,
-      required: [true, 'Name of the question is required'],
+      required: [true, 'Name of the problem is required'],
       trim: true,
+    },
+    user: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
     },
     slug: {
       type: String,
@@ -119,7 +126,7 @@ const QuestionSchema = new Schema<IQuestion, QuestionModel, IQuestionMethods>(
       default: [],
     },
     config: {
-      type: QuestionConfigSchema,
+      type: ProblemConfigSchema,
       required: [
         true,
         'Please fill in the configuration object with the required fields',
@@ -137,7 +144,7 @@ const QuestionSchema = new Schema<IQuestion, QuestionModel, IQuestionMethods>(
   },
 )
 
-QuestionSchema.pre('save', function (next) {
+ProblemSchema.pre('save', function (next) {
   if (!this.isModified('name')) return next()
 
   this.slug = slugify(this.name, {
@@ -148,9 +155,9 @@ QuestionSchema.pre('save', function (next) {
   next()
 })
 
-QuestionSchema.method(
+ProblemSchema.method(
   'populateDefaultConfigurations',
-  async function (): Promise<HydratedDocument<IQuestion, IQuestionMethods>> {
+  async function (): Promise<HydratedDocument<IProblem, IProblemMethods>> {
     this.defaultConfigurations = await Language.getDefaultConfigrations(
       this.config,
     )
@@ -158,13 +165,13 @@ QuestionSchema.method(
   },
 )
 
-QuestionSchema.virtual('acceptanceRate').get(function (): number {
+ProblemSchema.virtual('acceptanceRate').get(function (): number {
   return parseInt(((this.accepted / this.submissions) * 100).toFixed(1))
 })
 
-QuestionSchema.virtual('sampleTestCases', {
+ProblemSchema.virtual('sampleTestCases', {
   localField: 'id',
-  foreignField: 'question',
+  foreignField: 'problem',
   ref: 'TestCase',
   options: {
     fields: {
@@ -177,4 +184,4 @@ QuestionSchema.virtual('sampleTestCases', {
   },
 })
 
-export default model<IQuestion, QuestionModel>('Question', QuestionSchema)
+export default model<IProblem, ProblemModel>('Problem', ProblemSchema)
