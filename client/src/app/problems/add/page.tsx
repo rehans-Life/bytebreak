@@ -23,21 +23,8 @@ import { ProblemSchema } from './schemas'
 import { useAtomValue } from 'jotai'
 import { tagsAtom } from '@/app/atoms/tagAtoms'
 import { atomWithQuery } from 'jotai-tanstack-query'
+import { convert } from '@/app/utils/convert'
 
-const options: Option<number>[] = [
-  {
-    value: 1,
-    label: 'Dynamic Programming',
-  },
-  {
-    value: 2,
-    label: 'Linked List',
-  },
-  {
-    value: 3,
-    label: 'Python',
-  },
-]
 
 const types = [
   {
@@ -85,8 +72,6 @@ const editroialDefaultMarkup =
 
 export default function Add() {
   const { data } = useAtomValue(tagsAtom)
-
-  console.log(data)
 
   const methods = useForm<ProblemType>({
     resolver: zodResolver(ProblemSchema),
@@ -157,7 +142,7 @@ export default function Add() {
                     <Select
                       enableSearch={true}
                       isMulti={true}
-                      options={options}
+                      options={convert(data, 'name', '_id')}
                       menuWidth="w-[260px]"
                       menuHeight="max-h-64"
                       placeholder="Filter topics"
