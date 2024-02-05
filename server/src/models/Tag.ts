@@ -7,12 +7,14 @@ slugify.extend({
 })
 
 interface ITag {
+  _id: number
   name: string
   slug: string
   category: 'topic' | 'language'
 }
 
 const TagSchema = new Schema<ITag>({
+  _id: Number,
   name: {
     type: String,
     required: [true, 'Please provide the tag name'],

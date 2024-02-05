@@ -9,7 +9,6 @@ import keys from '../config/keys'
 const PORT = keys.PORT || 4000
 const MONGO_URI = keys.DB_URI
 
-
 ;(async () => {
   try {
     await mongoose.connect(MONGO_URI)

@@ -1,11 +1,9 @@
 import { Schema, Types, model } from 'mongoose'
 
 export interface ITestCase {
-  id: string
   problem: Types.ObjectId
   input: string
   output: string
-  sample: boolean
 }
 
 const TestCaseSchema = new Schema<ITestCase>({
@@ -21,10 +19,6 @@ const TestCaseSchema = new Schema<ITestCase>({
   output: {
     type: String,
     required: [true, 'Test case must have an output'],
-  },
-  sample: {
-    type: Boolean,
-    default: false,
   },
 })
 

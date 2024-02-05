@@ -48,6 +48,7 @@ module.exports = {
         'dark-green-s': 'rgb(44 187 93)',
         'dark-green-hover': 'rgb(50 200 100)',
         'dark-blue-s': 'rgb(10 132 255)',
+        'dark-blue-l': 'rgba(10, 132, 255, 0.2)',
         'dark-blue-h': 'rgba(10, 132, 255, 0.9);',
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',

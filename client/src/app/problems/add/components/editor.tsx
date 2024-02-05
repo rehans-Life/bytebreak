@@ -4,46 +4,32 @@ import {
   Types,
   getDefaultCodeConfiguration,
 } from 'lang-code-configuration'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Control, useWatch } from 'react-hook-form'
 import { ProblemType } from '../interfaces'
 import { Editor as MonacoEditor } from '@monaco-editor/react'
 import { langs } from 'lang-code-configuration/data'
-
-const langs = [
-  {
-    label: 'Javascript',
-    value: 'javascript',
-  },
-  {
-    label: 'Typescript',
-    value: 'typescript',
-  },
-  {
-    label: 'Python',
-    value: 'python',
-  },
-  {
-    label: 'Java',
-    value: 'java',
-  },
-  {
-    label: 'Dart',
-    value: 'dart',
-  },
-  {
-    label: 'C++',
-    value: 'cpp',
-  },
-] as Option<string>[]
+import { useAtomValue } from 'jotai'
+import { languagesAtom } from '@/app/atoms/tagAtoms'
+import { convert } from '@/app/utils/convert'
 
 export default function Editor({ control }: { control: Control<ProblemType> }) {
+  const langs = useAtomValue(languagesAtom)
+
   const { funcName, params, returnType } = useWatch({
     control,
     name: 'config',
   })
 
-  const [lang, setLang] = useState<Option<string> | undefined>(langs[0])
+  const [lang, setLang] = useState<Option<string> | undefined>()
+
+  useEffect(() => {
+    if (!langs.length) return
+    setLang({
+      label: langs[0].name,
+      value: langs[0].slug,
+    })
+  }, [langs])
 
   return (
     <>
@@ -54,8 +40,8 @@ export default function Editor({ control }: { control: Control<ProblemType> }) {
           name="Language"
           menuWidth="w-[200px]"
           menuHeight="h-[150px]"
-          inlineBtnStyle=""
-          options={langs}
+          inlineBtnStyle="w-32"
+          options={convert<string>(langs, 'name', 'slug')}
           value={lang}
           onChange={(o) => setLang(o)}
           replaceName={true}

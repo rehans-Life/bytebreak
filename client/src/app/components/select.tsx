@@ -22,6 +22,8 @@ interface Props<VT> {
   inlineBtnStyle?: string
   btnStyle?: React.CSSProperties
   options: Option<VT>[]
+  highlightedOptions?: Option<VT>[]
+  highlightTag?: string
 }
 
 interface MultiProps<VT> {
@@ -39,10 +41,14 @@ interface SingleProps<VT> {
 const Option = function <VT>({
   option,
   props,
+  isHighlighted,
+  highlightedTag = 'Related',
   setShowMenu,
 }: {
   option: Option<VT>
   props: SingleProps<VT> | MultiProps<VT>
+  isHighlighted?: boolean
+  highlightedTag?: string
   setShowMenu: React.Dispatch<React.SetStateAction<boolean>>
 }) {
   const selected = props.value
@@ -83,13 +89,20 @@ const Option = function <VT>({
         }
       }}
     >
-      <div
-        className="label"
-        style={{
-          color: option.color ?? 'white',
-        }}
-      >
-        {option.label}
+      <div className="flex items-center gap-x-2.5">
+        <div
+          className="label"
+          style={{
+            color: option.color ?? 'white',
+          }}
+        >
+          {option.label}
+        </div>
+        {isHighlighted && (
+          <span className="px-1.5 py-1 rounded-md font-normal text-dark-blue-s bg-dark-blue-l">
+            {highlightedTag}
+          </span>
+        )}
       </div>
       {selected && (
         <IoCheckmark className="text-blue-s dark:text-dark-blue-s h-4 w-4" />
@@ -114,6 +127,8 @@ export default function Select<VT = unknown>({
   onChange,
   onBlur,
   onFocus,
+  highlightTag,
+  highlightedOptions,
 }: (SingleProps<VT> | MultiProps<VT>) & Props<VT>) {
   const [showMenu, setShowMenu] = useState(false)
   const [query, setQuery] = useState('')
@@ -151,7 +166,7 @@ export default function Select<VT = unknown>({
           <button
             type="button"
             style={btnStyle}
-            className={`${inlineBtnStyle} bg-dark-fill-2 hover:bg-dark-hover text-[15px] text-white px-3 py-1 rounded-md flex items-center justify-between gap-x-3`}
+            className={`${inlineBtnStyle} bg-dark-fill-2 hover:bg-dark-hover text-[15px] text-white px-3 py-1 rounded-md flex items-center justify-between gap-x-1`}
           >
             <div className="capitalize">
               {replaceName && value ? (
@@ -244,6 +259,10 @@ export default function Select<VT = unknown>({
                     <Option
                       key={i}
                       option={option}
+                      highlightedTag={highlightTag}
+                      isHighlighted={highlightedOptions?.some(
+                        (tag) => tag.value === option.value
+                      )}
                       props={
                         isMulti
                           ? {

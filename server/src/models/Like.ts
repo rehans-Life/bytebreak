@@ -1,21 +1,41 @@
-import { HydratedDocument, Schema, Types, model } from 'mongoose'
-import Comment from './Comment'
+import mongoose, {
+  HydratedDocument,
+  Model,
+  Schema,
+  Types,
+  model,
+} from 'mongoose'
 import AppError from '../utils/appError'
 
 export interface ILike {
-  comment: Types.ObjectId
+  parent: Types.ObjectId
   user: Types.ObjectId
+  ref: 'problem' | 'comment'
 }
 
-const LikeSchema = new Schema<ILike>(
+export interface ILikeMethods {
+  findParent(): Promise<
+    HydratedDocument<{
+      [key: string]: any
+      likes: number
+    }>
+  >
+}
+
+type ILikeModel = Model<ILike, {}, ILikeMethods>
+
+const LikeSchema = new Schema<ILike, ILikeModel, ILikeMethods>(
   {
-    comment: {
+    parent: {
       type: Schema.Types.ObjectId,
-      ref: 'Comment',
     },
     user: {
       type: Schema.Types.ObjectId,
       ref: 'User',
+    },
+    ref: {
+      type: String,
+      enum: ['question', 'comment'],
     },
   },
   {
@@ -23,19 +43,23 @@ const LikeSchema = new Schema<ILike>(
   },
 )
 
+LikeSchema.method('findParent', async function () {
+  const parentDoc: HydratedDocument<any, any> = await mongoose
+    .model(this.ref)
+    .findById(this.parent)
+
+  if (!parentDoc) {
+    throw new AppError('There is no parent corresponding to the like', 404)
+  }
+  return parentDoc
+})
+
 LikeSchema.post('save', async function (doc, next) {
   try {
-    const comment = await Comment.findById(doc.comment)
+    const parent = await doc.findParent()
 
-    if (!comment) {
-      throw new AppError(
-        'There is no comment corresponding to the submission',
-        404,
-      )
-    }
-
-    comment.likes += 1
-    comment.save()
+    parent.likes += 1
+    parent.save()
 
     next()
   } catch (err) {
@@ -50,31 +74,27 @@ LikeSchema.post('save', async function (doc, next) {
   }
 })
 
-LikeSchema.post(/delete/i, async function (doc: HydratedDocument<ILike>, next) {
-  try {
-    const comment = await Comment.findById(doc)
+LikeSchema.post(
+  /delete/i,
+  async function (doc: HydratedDocument<ILike, ILikeMethods>, next) {
+    try {
+      const parent = await doc.findParent()
 
-    if (!comment) {
-      throw new AppError(
-        'There is question corresponding to the submission',
-        404,
+      parent.likes -= 1
+      parent.save()
+
+      next()
+    } catch (err) {
+      next(
+        new AppError(
+          err instanceof Error && err?.message
+            ? err.message
+            : 'An error occured while unliking the comment please try again',
+          500,
+        ),
       )
     }
+  },
+)
 
-    comment.likes -= 1
-    comment.save()
-
-    next()
-  } catch (err) {
-    next(
-      new AppError(
-        err instanceof Error && err?.message
-          ? err.message
-          : 'An error occured while unliking the comment please try again',
-        500,
-      ),
-    )
-  }
-})
-
-export default model<ILike>('Like', LikeSchema)
+export default model<ILike, ILikeModel>('Like', LikeSchema)

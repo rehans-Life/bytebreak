@@ -1,13 +1,21 @@
 import fs from 'fs'
 import mongoose from 'mongoose'
-import Tag from '../dist/src/models/Tag.js'
+import Tag from '../src/models/Tag'
 import dotenv from 'dotenv'
 
 dotenv.config({
   path: '.env',
 })
 
-const tags = JSON.parse(fs.readFileSync(`${__dirname}/tags.json`, 'utf-8'))
+let tags = (
+  JSON.parse(fs.readFileSync(`${__dirname}/tags.json`, 'utf-8')) as any[]
+).map((obj, index) => {
+  return {
+    name: obj.name,
+    _id: obj.id || index + 100,
+    category: obj.category || 'language',
+  }
+})
 
 ;(async () => {
   try {
@@ -17,6 +25,7 @@ const tags = JSON.parse(fs.readFileSync(`${__dirname}/tags.json`, 'utf-8'))
         process.env.DB_PASSWORD || '',
       ) || '',
     )
+
     if (process.argv[2] === '--import') {
       await importData()
     }

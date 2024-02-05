@@ -1,5 +1,5 @@
 import React from 'react'
-import { ParamType, ProblemType } from '../interfaces'
+import { ProblemType, types } from '../interfaces'
 import { Controller, useFieldArray, useFormContext } from 'react-hook-form'
 import Select from '@/app/components/select'
 import Editor from './editor'
@@ -7,21 +7,6 @@ import Input from '@/app/components/input'
 import { FiPlus } from 'react-icons/fi'
 import { useToast } from '@/components/ui/use-toast'
 import styles from '../page.styles'
-
-export const types = [
-  {
-    value: 1,
-    label: 'String',
-  },
-  {
-    value: 2,
-    label: 'Integer',
-  },
-  {
-    value: 3,
-    label: 'Integer[]',
-  },
-]
 
 export default function ConfigForm() {
   const { register, control } = useFormContext<ProblemType>()
@@ -60,6 +45,7 @@ export default function ConfigForm() {
                   onBlur={field.onBlur}
                   menuWidth="w-full"
                   inlineBtnStyle="w-full"
+                  menuHeight="h-[150px]"
                   btnStyle={{
                     padding: '8.5px',
                     fontWeight: '600',
@@ -78,7 +64,7 @@ export default function ConfigForm() {
                 paramsField.append({
                   name: '',
                   type: types[0],
-                } as ParamType)
+                })
               }
               className={`${styles.btn} gap-x-[3px] bg-dark-blue-s hover:bg-dark-blue-h text-white`}
             >
@@ -114,6 +100,7 @@ export default function ConfigForm() {
                           value={field.value}
                           onBlur={field.onBlur}
                           menuWidth="xs:w-[200px] w-[125px]"
+                          menuHeight="h-[150px]"
                           inlineBtnStyle="w-full"
                           btnStyle={{
                             padding: '8.5px',
@@ -145,7 +132,7 @@ export default function ConfigForm() {
           </div>
         </div>
       </div>
-      <div className="w-full overflow-hidden">
+      <div className="w-full overflow-x-clip md:mb-10 mb-0">
         <Editor control={control} />
       </div>
     </div>

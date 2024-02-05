@@ -28,6 +28,7 @@ interface LanguageModel extends Model<ILanguage, {}, LanguageMethods> {
 
 const LanguageSchema = new Schema<ILanguage, LanguageModel, LanguageMethods>({
   name: {
+    type: String,
     enum: ['Javascript', 'Python', 'Typescript', 'Dart', 'Java', 'C++'],
     required: [true, 'The language name is required'],
     unique: true,

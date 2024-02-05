@@ -1,7 +1,7 @@
 import z from 'zod'
 
 export const OptionSchema = z.object({
-  value: z.number(),
+  value: z.any(),
   label: z.string(),
   color: z.string().nullish(),
 })
@@ -18,12 +18,12 @@ export const ProblemConfigSchema = z.object({
 })
 
 export const ProblemSchema = z.object({
-  title: z.string().min(1),
+  name: z.string().min(1),
   tags: z.array(OptionSchema),
   difficulty: OptionSchema,
   description: z.string().min(1),
   config: ProblemConfigSchema,
-  testCases: z
+  testcases: z
     .instanceof(File)
     .refine((file) => file.type === 'application/json'),
   editorial: z.string().min(1),

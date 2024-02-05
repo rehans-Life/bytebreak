@@ -3,6 +3,7 @@ import keys from '../../config/keys'
 import AppError from '../utils/appError'
 import { MongoServerError } from 'mongodb'
 import { CastError } from 'mongoose'
+import { ZodError } from 'zod'
 
 class MongooseCastError implements CastError {
   model?: any
@@ -46,6 +47,16 @@ function handleExipredTokenError() {
 function handleJWTMalformedError() {
   return new AppError(
     `Invaid Authorization token, please login again to recieve a new one`,
+    400,
+  )
+}
+
+function handleZodError(error: ZodError) {
+  return new AppError(
+    error.errors.reduce((acc, curr, i) => {
+      const message = `${curr.path[curr.path.length - 1]}: ${curr.message};`
+      return `${acc} ${message}`
+    }, ''),
     400,
   )
 }
@@ -97,6 +108,7 @@ export default (error: Error, req: Request, res: Response, _: NextFunction) => {
     appError = handleDuplicateKeyError(error)
   if (error.name === 'JsonWebTokenError') appError = handleJWTMalformedError()
   if (error.name === 'TokenExpiredError') appError = handleExipredTokenError()
+  if (error instanceof ZodError) appError = handleZodError(error)
 
   handleProdError(appError, req, res)
 }

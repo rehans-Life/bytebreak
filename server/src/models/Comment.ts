@@ -21,6 +21,7 @@ const CommentSchema = new Schema<IComment>(
     user: {
       type: Schema.Types.ObjectId,
       required: [true, 'The comment must be written by a user'],
+      ref: 'User',
     },
     title: {
       type: String,
@@ -32,7 +33,7 @@ const CommentSchema = new Schema<IComment>(
           if (parent && !value && !value.length) return false
           else return true
         },
-        message: 'Title is required for a solution',
+        message: '{PATH} is required for a solution',
       },
     },
     text: {
@@ -40,7 +41,7 @@ const CommentSchema = new Schema<IComment>(
       required: [true, 'The comment must have some text'],
     },
     tags: {
-      type: [Schema.Types.ObjectId],
+      type: [Number],
       ref: 'Tag',
       default: [],
     },

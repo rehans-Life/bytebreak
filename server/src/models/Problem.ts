@@ -34,21 +34,24 @@ interface IProblemMethods {
 }
 
 type ProblemModel = Model<IProblem, {}, IProblemMethods>
+type datatype =
+  | 'Boolean'
+  | 'String'
+  | 'Integer'
+  | 'Integer[]'
+  | 'String[]'
+  | 'Integer[][]'
+  | 'String[][]'
+
+interface Param {
+  name: string
+  type: datatype
+}
 
 export interface ProblemConfig {
   funcName: string
-  returnType: ParamType
-  params: {
-    name: string
-    type:
-      | 'Boolean'
-      | 'String'
-      | 'Integer'
-      | 'Integer[]'
-      | 'String[]'
-      | 'Integer[][]'
-      | 'String[][]'
-  }[]
+  returnType: datatype
+  params: Param[]
 }
 
 export interface DefaultConfiguration {
@@ -64,11 +67,17 @@ const ProblemConfigSchema = new Schema<ProblemConfig>({
     lowercase: true,
   },
   returnType: {
+    type: String,
     enum: Object.values(ParamType),
     required: [true, 'Function return type is required'],
   },
   params: {
-    minlength: [1, 'You should add atleast one parameter'],
+    validate: {
+      validator: function (val: Array<Param>) {
+        return val.length >= 1
+      },
+      message: 'One param is required at minimum',
+    },
     type: [
       {
         name: {
@@ -121,7 +130,7 @@ const ProblemSchema = new Schema<IProblem, ProblemModel, IProblemMethods>(
       default: 0,
     },
     tags: {
-      type: [Schema.Types.ObjectId],
+      type: [Number],
       ref: 'Tag',
       default: [],
     },
@@ -173,14 +182,12 @@ ProblemSchema.virtual('sampleTestCases', {
   localField: 'id',
   foreignField: 'problem',
   ref: 'TestCase',
+  limit: 3,
   options: {
     fields: {
       input: 1,
       output: 1,
     },
-  },
-  match: {
-    sample: true,
   },
 })
 
