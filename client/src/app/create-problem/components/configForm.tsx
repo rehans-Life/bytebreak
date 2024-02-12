@@ -4,9 +4,9 @@ import { Controller, useFieldArray, useFormContext } from 'react-hook-form'
 import Select from '@/app/components/select'
 import Editor from './editor'
 import Input from '@/app/components/input'
-import { FiPlus } from 'react-icons/fi'
+import { FiPlus } from '@react-icons/all-files/fi/FiPlus'
 import { useToast } from '@/components/ui/use-toast'
-import styles from '../page.styles'
+import styles from '../styles'
 
 export default function ConfigForm() {
   const { register, control } = useFormContext<ProblemType>()
@@ -37,6 +37,7 @@ export default function ConfigForm() {
                 <Select
                   isMulti={false}
                   enableSearch={false}
+                  undefined={false}
                   options={types}
                   replaceName={true}
                   name={'Return Type'}
@@ -62,7 +63,7 @@ export default function ConfigForm() {
               type="button"
               onClick={() =>
                 paramsField.append({
-                  name: '',
+                  name: `param${paramsField.fields.length + 1}`,
                   type: types[0],
                 })
               }
@@ -95,6 +96,7 @@ export default function ConfigForm() {
                           enableSearch={false}
                           options={types}
                           replaceName={true}
+                          undefined={false}
                           name={'Type'}
                           onChange={field.onChange}
                           value={field.value}
@@ -133,7 +135,7 @@ export default function ConfigForm() {
         </div>
       </div>
       <div className="w-full overflow-x-clip md:mb-10 mb-0">
-        <Editor control={control} />
+        <Editor />
       </div>
     </div>
   )

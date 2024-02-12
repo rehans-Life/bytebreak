@@ -1,6 +1,5 @@
-import { HydratedDocument, Model, Schema, Types, model } from 'mongoose'
+import { Schema, Types, model } from 'mongoose'
 import slugify from 'slugify'
-import Language from './Language'
 
 export enum ParamType {
   Boolean = 'Boolean',
@@ -23,17 +22,13 @@ interface IProblem {
   submissions: number
   acceptanceRate: number
   tags: Types.ObjectId[]
-  defaultConfigurations: DefaultConfiguration[]
+  solution: {
+    languageId: number,
+    code: string
+  }
   sampleTestCases: { input: string; output: string }[]
 }
 
-interface IProblemMethods {
-  populateDefaultConfigurations: () => Promise<
-    HydratedDocument<IProblem, IProblemMethods>
-  >
-}
-
-type ProblemModel = Model<IProblem, {}, IProblemMethods>
 type datatype =
   | 'Boolean'
   | 'String'
@@ -43,7 +38,7 @@ type datatype =
   | 'Integer[][]'
   | 'String[][]'
 
-interface Param {
+export interface Param {
   name: string
   type: datatype
 }
@@ -64,7 +59,6 @@ const ProblemConfigSchema = new Schema<ProblemConfig>({
   funcName: {
     type: String,
     required: [true, 'Function name is required'],
-    lowercase: true,
   },
   returnType: {
     type: String,
@@ -90,10 +84,10 @@ const ProblemConfigSchema = new Schema<ProblemConfig>({
         },
       },
     ],
-  },
+  }
 })
 
-const ProblemSchema = new Schema<IProblem, ProblemModel, IProblemMethods>(
+const ProblemSchema = new Schema<IProblem>(
   {
     name: {
       type: String,
@@ -104,6 +98,7 @@ const ProblemSchema = new Schema<IProblem, ProblemModel, IProblemMethods>(
     user: {
       type: Schema.Types.ObjectId,
       ref: 'User',
+      required: [true, 'Users ID is required for creating a problem'],
     },
     slug: {
       type: String,
@@ -133,6 +128,20 @@ const ProblemSchema = new Schema<IProblem, ProblemModel, IProblemMethods>(
       type: [Number],
       ref: 'Tag',
       default: [],
+    },
+    solution: {
+      type: {
+        languageId: {
+          type: Number, 
+          ref: 'Tag',
+          required: [true, 'Solution must be written in a specific language']
+        },
+        code: { 
+          type: String,       
+          required: [true, 'The problem requires a solution']
+        }
+      },
+      select: false,
     },
     config: {
       type: ProblemConfigSchema,
@@ -164,31 +173,15 @@ ProblemSchema.pre('save', function (next) {
   next()
 })
 
-ProblemSchema.method(
-  'populateDefaultConfigurations',
-  async function (): Promise<HydratedDocument<IProblem, IProblemMethods>> {
-    this.defaultConfigurations = await Language.getDefaultConfigrations(
-      this.config,
-    )
-    return this
-  },
-)
-
 ProblemSchema.virtual('acceptanceRate').get(function (): number {
   return parseInt(((this.accepted / this.submissions) * 100).toFixed(1))
 })
 
 ProblemSchema.virtual('sampleTestCases', {
-  localField: 'id',
+  localField: '_id',
   foreignField: 'problem',
   ref: 'TestCase',
   limit: 3,
-  options: {
-    fields: {
-      input: 1,
-      output: 1,
-    },
-  },
 })
 
-export default model<IProblem, ProblemModel>('Problem', ProblemSchema)
+export default model<IProblem>('Problem', ProblemSchema)

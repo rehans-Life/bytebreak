@@ -1,4 +1,4 @@
-import z from 'zod'
+import z, { string } from 'zod'
 
 export const OptionSchema = z.object({
   value: z.any(),
@@ -27,4 +27,8 @@ export const ProblemSchema = z.object({
     .instanceof(File)
     .refine((file) => file.type === 'application/json'),
   editorial: z.string().min(1),
+  solution: z.object({
+    languageId: z.number(),
+    code: z.string().min(1)
+  })
 })

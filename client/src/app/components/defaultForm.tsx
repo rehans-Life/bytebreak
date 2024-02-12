@@ -1,28 +1,38 @@
-import MarkdownEditor from '@uiw/react-markdown-editor'
 import React from 'react'
 import { Controller, useFormContext } from 'react-hook-form'
 import Select, { Option } from './select'
-import { IoAdd, IoClose } from 'react-icons/io5'
-import styles from '../problems/add/page.styles'
+import { IoAdd } from '@react-icons/all-files/io5/IoAdd'
+import { IoClose } from '@react-icons/all-files/io5/IoClose'
+import styles from '../create-problem/styles'
 import { convert } from '../utils/convert'
-import { TbSend } from 'react-icons/tb'
-import { ProblemType } from '../problems/add/interfaces'
+import { IoSend } from '@react-icons/all-files/io5/IoSend'
+import { ProblemType } from '../create-problem/interfaces'
 import { EditorView } from '@codemirror/view'
-import { Tag } from '../atoms/tagAtoms'
+import { Tag } from '../interfaces'
+import dynamic from 'next/dynamic'
+import MarkdownSkeleton from './markdown-skeleton'
+import { CgSpinner } from "@react-icons/all-files/cg/CgSpinner";
+
+const MarkdownEditor = dynamic(
+  () => import("@uiw/react-markdown-editor").then((mod) => mod.default),
+  { ssr: false, loading() { return <MarkdownSkeleton /> } }
+);
 
 export default function DefaultForm({
   highlightedTags,
   tags,
   difficulties,
+  isPending
 }: {
   highlightedTags?: Tag[]
   tags: Tag[]
   difficulties: Option<string>[]
+  isPending: boolean
 }) {
   const {
     register,
     control,
-    formState: { isSubmitting, isValid },
+    formState: { isValid },
   } = useFormContext<ProblemType>()
 
   return (
@@ -42,11 +52,15 @@ export default function DefaultForm({
               Cancel
             </button>
             <button
-              disabled={!isValid || isSubmitting}
-              className={`${styles.btn} bg-dark-green-s disabled:cursor-not-allowed disabled:opacity-50 text-white hover:bg-dark-green-hover`}
+              disabled={!isValid || isPending}
+              className={`${styles.btn} w-20 bg-dark-green-s flex justify-center disabled:cursor-not-allowed disabled:opacity-50 text-white hover:bg-dark-green-hover`}
             >
-              <TbSend />
-              <span>Post</span>
+              {isPending ? <CgSpinner size={22} className='animate-spin text-white' /> :
+                <>
+                  <IoSend />
+                  <span>Post</span>
+                </>
+              }
             </button>
           </div>
         </div>
@@ -65,6 +79,7 @@ export default function DefaultForm({
                       ? convert<number>(highlightedTags, 'name', '_id')
                       : []
                   }
+                  undefined={true}
                   menuWidth="w-[260px]"
                   menuHeight="max-h-56"
                   placeholder="Filter topics"
@@ -112,6 +127,7 @@ export default function DefaultForm({
                   menuHeight="max-h-auto"
                   placeholder="Filter topics"
                   replaceName={true}
+                  undefined={true}
                   name={field.name}
                   btnStyle={{
                     minWidth: '110px',

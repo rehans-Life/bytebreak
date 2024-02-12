@@ -10,7 +10,7 @@ const verifyToken = (token: string) => jwt.verify(token, keys.JWT_SECRET_KEY)
 
 const signToken = (id: string) => {
   return jwt.sign({ id }, keys.JWT_SECRET_KEY, {
-    expiresIn: '1s',
+    expiresIn: keys.JWT_EXPIRES_IN,
   })
 }
 

@@ -1,7 +1,9 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import React, { useEffect, useRef, useState } from 'react'
-import { IoChevronDownOutline, IoClose } from 'react-icons/io5'
-import { IoCheckmark, IoSearch } from 'react-icons/io5'
+import { IoChevronDownOutline } from '@react-icons/all-files/io5/IoChevronDownOutline'
+import { IoClose } from '@react-icons/all-files/io5/IoClose'
+import { IoCheckmark } from '@react-icons/all-files/io5/IoCheckmark'
+import { IoSearch } from '@react-icons/all-files/io5/IoSearch'
 
 export interface Option<T> {
   value: T
@@ -24,18 +26,29 @@ interface Props<VT> {
   options: Option<VT>[]
   highlightedOptions?: Option<VT>[]
   highlightTag?: string
-}
+}4
 
 interface MultiProps<VT> {
   isMulti: true
   value?: Option<VT>[]
+  undefined: true
   onChange?: (options?: Option<VT>[]) => void
 }
 
 interface SingleProps<VT> {
   isMulti: false
+}
+
+interface NonNullSingle<VT> extends SingleProps<VT> {
+  undefined: true
   value?: Option<VT>
   onChange?: (option?: Option<VT>) => void
+}
+
+interface NullableSingle<VT> extends SingleProps<VT> {
+  undefined: false
+  value: Option<VT>
+  onChange?: (option: Option<VT>) => void
 }
 
 const Option = function <VT>({
@@ -46,7 +59,7 @@ const Option = function <VT>({
   setShowMenu,
 }: {
   option: Option<VT>
-  props: SingleProps<VT> | MultiProps<VT>
+  props: NullableSingle<VT> | NonNullSingle<VT> | MultiProps<VT>
   isHighlighted?: boolean
   highlightedTag?: string
   setShowMenu: React.Dispatch<React.SetStateAction<boolean>>
@@ -62,11 +75,10 @@ const Option = function <VT>({
       style={{
         color: option.color,
       }}
-      className={`text-dark-gray-8 py-2 ${
-        selected
-          ? `font-medium text-dark-label-1`
-          : `font-normal text-dark-label-2`
-      }  text-sm rounded-md px-3 hover:bg-dark-button cursor-pointer flex items-center justify-between gap-x-3`}
+      className={`text-dark-gray-8 py-2 ${selected
+        ? `font-medium text-dark-label-1`
+        : `font-normal text-dark-label-2`
+        }  text-sm rounded-md px-3 hover:bg-dark-button cursor-pointer flex items-center justify-between gap-x-3`}
       onClick={() => {
         if (selected) {
           if (props.isMulti) {
@@ -75,7 +87,7 @@ const Option = function <VT>({
             )
           } else {
             setShowMenu((prev) => !prev)
-            props.onChange?.()
+            if (props.undefined) props.onChange?.()
           }
 
           return
@@ -123,13 +135,14 @@ export default function Select<VT = unknown>({
   isMulti,
   replaceName,
   btnStyle,
+  undefined,
   inlineBtnStyle,
   onChange,
   onBlur,
   onFocus,
   highlightTag,
   highlightedOptions,
-}: (SingleProps<VT> | MultiProps<VT>) & Props<VT>) {
+}: (NullableSingle<VT> | NonNullSingle<VT> | MultiProps<VT>) & Props<VT>) {
   const [showMenu, setShowMenu] = useState(false)
   const [query, setQuery] = useState('')
 
@@ -152,11 +165,11 @@ export default function Select<VT = unknown>({
     return () => {
       document.removeEventListener('click', onClick)
     }
-  }, [])
+  }, [onBlur])
 
   return (
-    <div ref={containerRef} className="w-auto relative">
-      <div
+    <div ref={containerRef} className="relative">
+      <span
         onClick={() => {
           setShowMenu(!showMenu)
           onFocus?.()
@@ -172,12 +185,12 @@ export default function Select<VT = unknown>({
               {replaceName && value ? (
                 isMulti ? (
                   <div className="flex items-center gap-x-1">
-                    {value.map((option) => (
-                      <span className="p-1 flex items-center gap-x-1 cursor-pointer rounded-md text-[11px] hover:bg-layer-2 text-white bg-dark-layer-1">
+                    {value.map((option, i) => (
+                      <span key={i} className="p-1 flex items-center gap-x-1 cursor-pointer rounded-md text-[11px] hover:bg-layer-2 text-white bg-dark-layer-1">
                         <span>{option.label}</span>
                         <IoClose
                           size={16}
-                          onClick={(e) => {
+                          onClick={(e: Event) => {
                             e.stopPropagation()
                             onChange?.(
                               value?.filter(
@@ -203,20 +216,18 @@ export default function Select<VT = unknown>({
               )}
             </div>
             <IoChevronDownOutline
-              className={`${
-                showMenu ? 'rotate-180' : 'rotate-0'
-              } ease-in duration-200`}
+              className={`${showMenu ? 'rotate-180' : 'rotate-0'
+                } ease-in duration-200`}
             />
           </button>
         )}
-      </div>
+      </span>
       <AnimatePresence>
         {showMenu && (
           <motion.div
             ref={bottomMenuRef}
-            className={`absolute top-full my-2 overflow-hidden rounded-md z-[9999] shadow-sm shadow-dark-layer-3 bg-dark-layer-3  ${
-              menuWidth || 'w-auto'
-            }`}
+            className={`absolute top-full my-2 overflow-hidden rounded-md z-[9999] shadow-sm shadow-dark-layer-3 bg-dark-layer-3  ${menuWidth || 'w-auto'
+              }`}
             initial={{
               opacity: 0,
               y: '3%',
@@ -263,18 +274,12 @@ export default function Select<VT = unknown>({
                       isHighlighted={highlightedOptions?.some(
                         (tag) => tag.value === option.value
                       )}
-                      props={
-                        isMulti
-                          ? {
-                              isMulti,
-                              onChange,
-                              value,
-                            }
-                          : {
-                              isMulti,
-                              onChange,
-                              value,
-                            }
+                      props={{
+                        isMulti,
+                        onChange,
+                        value,
+                        undefined,
+                      } as MultiProps<VT> | NonNullSingle<VT> | NullableSingle<VT>
                       }
                       setShowMenu={setShowMenu}
                     />

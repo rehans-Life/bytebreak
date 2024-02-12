@@ -1,18 +1,50 @@
-const { stdin, stdout } = require('process')
+const { stdin, stdout, stderr, exit } = require('process')
 
 let inputsData = ''
-let params
-let args
+let funcName = ''
+let params = []
+let args = ''
 
 stdin.on('data', (data) => {
   inputsData += data.toString('utf-8')
 })
 
 stdin.on('end', () => {
-  ;[params, args] = inputsData.trim().split('|')
+  ;[funcName, params, args] = inputsData.trim().split('|')
   params = JSON.parse(params.replace(/\\/g, ''))
   main()
 })
+
+function convertArg(type, input) {
+  let temp;
+
+  try {
+    switch (type) {
+      case 'String[][]':
+      case 'Integer[][]':
+        temp = JSON.parse(input)
+        if(!temp.every((el) => el instanceof Array)) throw TypeError();
+        return temp
+
+      case 'Integer[]':
+      case 'String[]':
+        return JSON.parse(input)
+
+      case 'Integer':
+        temp = parseInt(input)
+        if(Number.isNaN(temp)) throw TypeError();
+        return temp
+        
+      case 'Boolean':
+        return input === 'true' ? true : false
+      default:
+        return input
+    }
+  } catch (err) {
+    stderr.write(`${input} is not a valid value of type ${type}`)
+    exit(1)
+  }
+}
 
 function main() {
   const inputs = args.split(/\n/)
@@ -21,30 +53,12 @@ function main() {
   for (let i = 0; i < inputs.length; i++) {
     const param = params[i]
     const input = inputs[i]
-    let temp
-
-    switch (param.type) {
-      case 'Integer[]':
-      case 'String[]':
-      case 'Integer[][]':
-      case 'String[][]':
-        temp = JSON.parse(input)
-        break
-      case 'Integer':
-        temp = parseInt(input)
-        break
-      case 'Boolean':
-        temp = input === 'true' ? true : false
-        break
-      default:
-        temp = input
-        break
-    }
-
-    convertedArgs.push(temp)
+    convertedArgs.push(convertArg(param.type, input))
   }
 
-  func(...convertedArgs)
+  const output = eval(funcName)(...convertedArgs)
+
+  stdout.write(output.toString())
 }
 
-let func
+

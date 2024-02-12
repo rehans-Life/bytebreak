@@ -3,10 +3,12 @@ import {
   createProblem,
   getProblem,
   getProblems,
+  getDefaultConfigurations,
+  getEditorial
 } from '../controllers/problemController'
-import { protect } from '../controllers/authController'
 import multer from 'multer'
 import AppError from '../utils/appError'
+import { protect } from '../controllers/authController'
 
 const storage = multer.memoryStorage()
 const upload = multer({
@@ -25,8 +27,12 @@ const router = Router()
 router
   .route('/')
   .get(getProblems)
-  .post(upload.single('testcases'), createProblem)
+  .post(protect, upload.single('testcases'), createProblem)
 
-router.route('/:slug').get(protect, getProblem)
+router.route('/:identifier').get(getProblem);
+
+router.route('/:identifier/defaultConfigurations').get(getDefaultConfigurations);
+
+router.route('/:identifier/editorial').get(getEditorial);
 
 export default router

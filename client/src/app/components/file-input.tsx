@@ -1,6 +1,6 @@
 import React from 'react'
 import { UploadCloud } from 'lucide-react'
-import { BsFileEarmarkCheck } from 'react-icons/bs'
+import { BsFileEarmarkCheck } from '@react-icons/all-files/bs/BsFileEarmarkCheck'
 import { ControllerRenderProps } from 'react-hook-form'
 
 export default function FileInput({

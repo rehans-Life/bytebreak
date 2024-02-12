@@ -1,17 +1,35 @@
 import { Error, Schema, Types, model } from 'mongoose'
 import Problem from './Problem'
 import AppError from '../utils/appError'
+import { ITestCase } from './TestCase'
+
+const statuses = [
+  "Accepted",
+  "Wrong Answer",
+  "Time Limit Exceeded",
+  "Compilation Error",
+  "Runtime Error (SIGSEGV)",
+  "Runtime Error (SIGXFSZ)",
+  "Runtime Error (SIGFPE)",
+  "Runtime Error (SIGABRT)",
+  "Runtime Error (NZEC)",
+  "Runtime Error (Other)",
+  "Internal Error",
+  "Exec Format Error"
+] as const;
+
+export type StatusTypes = typeof statuses[number]
 
 interface ISubmission {
   problem: Types.ObjectId
   user: Types.ObjectId
-  language: Types.ObjectId
+  language: number
   code: string
-  runtime: number
-  memory: number
-  status: 'Wrong Answer' | 'Accepted' | 'Runtime Error'
+  runtime: String
+  memory: String
+  status: StatusTypes
   testCasesPassed: number
-  lastExecutedInput?: string
+  lastExecutedTestcase?: Types.ObjectId
   error?: string
 }
 
@@ -20,35 +38,42 @@ const SubmissionSchema = new Schema<ISubmission>(
     problem: {
       type: Schema.Types.ObjectId,
       ref: 'Problem',
+      required: [true, 'a submission should correspond to a problem']
     },
     user: {
       type: Schema.Types.ObjectId,
       ref: 'User',
+      required: [true, 'a submission should correspond to a user']
     },
     language: {
-      type: Schema.Types.ObjectId,
+      type: Number,
       ref: 'Language',
+      required: [true, 'a submission should be written in a specific language']
+    },
+    lastExecutedTestcase: {
+      type: Schema.Types.ObjectId,
+      ref: "TestCase"
     },
     code: {
       type: String,
-      required: [true, 'Code is required for a submission'],
+      required: [true, 'code is required for a submission'],
     },
     status: {
       type: String,
-      enum: ['Wrong Answer', 'Accepted', 'Runtime Error'],
-      default: 'Wrong Answer',
+      enum: { values: statuses, message: "{VALUE} is not a valid status for a submission" },
+      required: [true, 'status code is required for a submission'],
     },
     runtime: {
-      type: Number,
+      type: String,
+      default: 'N/A'
     },
     memory: {
-      type: Number,
+      type: String,
+      default: 'N/A'
     },
     testCasesPassed: {
       type: Number,
-    },
-    lastExecutedInput: {
-      type: String,
+      default: 0,
     },
     error: {
       type: String,

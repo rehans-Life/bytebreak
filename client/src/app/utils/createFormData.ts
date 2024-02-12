@@ -20,9 +20,14 @@ export default function (obj: Object) {
       return true
     }
 
-    if (typeof value === 'string' || value instanceof Blob) {
-      formData.append(field, value)
+    if (typeof value === 'string' || typeof value === 'number') {
+      formData.append(field, value.toString())
       return true
+    }
+
+    if(value instanceof Blob) {
+      formData.append(field, value)
+      return true      
     }
 
     return false

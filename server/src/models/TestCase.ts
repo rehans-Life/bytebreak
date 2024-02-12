@@ -1,10 +1,16 @@
 import { Schema, Types, model } from 'mongoose'
+import z from 'zod';
 
-export interface ITestCase {
-  problem: Types.ObjectId
-  input: string
-  output: string
-}
+export const testcaseSchema = z.object({
+    output: z.string(),
+    input: z.string(),
+});
+
+const testCasesDBSchema = testcaseSchema.extend({
+  problem: z.instanceof(Types.ObjectId)
+})
+
+export type ITestCase = z.infer<typeof testCasesDBSchema>
 
 const TestCaseSchema = new Schema<ITestCase>({
   problem: {

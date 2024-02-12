@@ -1,18 +1,11 @@
 import { atom } from 'jotai'
-import z, { set } from 'zod'
-
-export interface Tag {
-  _id: string
-  name: string
-  slug: string
-  category: 'language' | 'topic'
-}
+import { LanguageTag, Tag, TopicTag } from '../app/interfaces'
 
 export const tagsAtom = atom(
   (get) => [...get(languagesAtom), ...get(topicsAtom)],
-  (_, set, tags: Tag[]) => {
-    const languageTags: Tag[] = []
-    const topicTags: Tag[] = []
+  (_, set, tags: (LanguageTag | TopicTag)[]) => {
+    const languageTags: LanguageTag[] = []
+    const topicTags: TopicTag[] = []
 
     tags.forEach((tag) => {
       if (tag.category === 'language') {
@@ -28,6 +21,6 @@ export const tagsAtom = atom(
   }
 )
 
-export const topicsAtom = atom<Tag[]>([])
+export const topicsAtom = atom<TopicTag[]>([])
 
-export const languagesAtom = atom<Tag[]>([])
+export const languagesAtom = atom<LanguageTag[]>([])

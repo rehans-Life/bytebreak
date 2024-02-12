@@ -10,12 +10,13 @@ import userRoutes from './routes/userRoutes'
 import generalRoutes from './routes/generalRoutes'
 import problemRoutes from './routes/problemRoutes'
 import errorController from './controllers/errorController'
+import submissionRoutes from './routes/submissionRoutes'
 
 const app = express()
 
 app.use(
   cors({
-    origin: process.env.FRONTEND_URI,
+    origin: keys.FRONTEND_URI,
     credentials: true,
   }),
 )
@@ -30,6 +31,7 @@ if (keys.NODE_ENV === 'Development') {
 app.use('/api/v1/users', userRoutes)
 app.use('/api/v1/general', generalRoutes)
 app.use('/api/v1/problems', problemRoutes)
+app.use('/api/v1/submissions', submissionRoutes)
 
 app.use('*', (req, res, next) => {
   return next(new AppError(`Route ${req.path} not found on the server`, 404))

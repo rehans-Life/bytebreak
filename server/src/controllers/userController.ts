@@ -2,7 +2,7 @@ import { RequestHandler } from 'express'
 import catchAsync from '../utils/catchAsync'
 import User, { IUser, IUserMethods } from '../models/User'
 import { HydratedDocument } from 'mongoose'
-import { createOne, deleteOne, getOne, updateOne } from './handlerFactory'
+import { createOne, deleteOne, getAll, getOne, updateOne } from './handlerFactory'
 
 export const getMe: RequestHandler = catchAsync(async (req, res, next) => {
   req.params.id = req.user.id
@@ -42,14 +42,7 @@ export const deleteMe: RequestHandler = catchAsync(async (req, res, _) => {
   })
 })
 
-export const getUsers: RequestHandler = catchAsync(async (req, res, next) => {
-  const users = await User.find()
-
-  return res.status(200).json({
-    status: 'success',
-    data: { users },
-  })
-})
+export const getUsers: RequestHandler = getAll(User)
 
 export const createUser: RequestHandler = createOne(User)
 

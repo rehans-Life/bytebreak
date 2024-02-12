@@ -39,13 +39,17 @@ class ApiFeatures {
     const page = this.queryObj.page || 1
     const limit = this.queryObj.limit || 100
 
-    this.query = this.query.skip(page * limit)
+    this.query = this.query.skip((page - 1) * limit).limit(limit)
 
     return this
   }
 
   sort() {
-    this.query = this.query.sort(this.queryObj.sort)
+    if (this.queryObj.sort) {
+      this.query = this.query.sort(this.queryObj.sort)
+    } else {
+      this.query = this.query.sort('-createdAt')
+    }
     return this
   }
 

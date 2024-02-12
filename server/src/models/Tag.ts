@@ -6,7 +6,7 @@ slugify.extend({
   '#': 'sharp',
 })
 
-interface ITag {
+export interface ITag {
   _id: number
   name: string
   slug: string

@@ -1,15 +1,19 @@
-import { Schema, Types, model } from 'mongoose'
+import { Schema, Types, model, HydratedDocument } from 'mongoose'
 import Problem from './Problem'
 
 export interface IComment {
   parentId: Types.ObjectId
   user: Types.ObjectId
+  tags?: Types.ObjectId[]
   title?: string
   text: string
-  tags?: Types.ObjectId[]
   likes: number
-  comments: number
+  replies: number
   views: number
+}
+
+function isInstanceOfComment(obj: any): obj is IComment {
+  return ('parentId' in obj && 'user' in obj && 'text' in obj)
 }
 
 const CommentSchema = new Schema<IComment>(
@@ -27,11 +31,12 @@ const CommentSchema = new Schema<IComment>(
       type: String,
       validate: {
         validator: async function (value: string): Promise<boolean> {
-          const parent = await Problem.findById((this as any).parentId)
+          if(!isInstanceOfComment(this)) return false;
 
-          // If the is a solution to the question then it must have a title
-          if (parent && !value && !value.length) return false
-          else return true
+          const parent = await Problem.findById(this.parentId)
+
+          if (parent && this.user !== parent.user && !value && !value.length) return false
+          return true
         },
         message: '{PATH} is required for a solution',
       },
@@ -49,7 +54,7 @@ const CommentSchema = new Schema<IComment>(
       type: Number,
       default: 0,
     },
-    comments: {
+    replies: {
       type: Number,
       default: 0,
     },

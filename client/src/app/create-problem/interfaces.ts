@@ -18,9 +18,14 @@ export type ProblemType = {
   config: ProblemConfig
   testcases: File
   editorial: string
+  solution: {
+    languageId: number,
+    code: string
+  }
 }
 
 export interface Problem {
+  _id: string,
   name: string
   slug: string
   tags: Tag[]
@@ -34,7 +39,7 @@ export interface Problem {
   submissions: number
   accepted: number
   acceptanceRate: number
-  sampleTestcases: Testcase[]
+  sampleTestCases: Testcase[]
 }
 
 export const types: Option<string>[] = Object.keys(getTypes('python')).map(
@@ -43,3 +48,4 @@ export const types: Option<string>[] = Object.keys(getTypes('python')).map(
     label: type,
   })
 )
+ 
