@@ -21,6 +21,7 @@ interface IProblem {
   accepted: number
   submissions: number
   acceptanceRate: number
+  likes: number
   tags: Types.ObjectId[]
   solution: {
     languageId: number,
@@ -118,11 +119,15 @@ const ProblemSchema = new Schema<IProblem>(
     },
     accepted: {
       type: Number,
-      default: 0,
+      default: 500000,
     },
     submissions: {
       type: Number,
-      default: 0,
+      default: 1000000,
+    },
+    likes: {
+      type: Number,
+      default: 100,
     },
     tags: {
       type: [Number],

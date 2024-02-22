@@ -6,6 +6,8 @@ import Problem from "../models/Problem";
 import { batchSubmission } from "./judge0Controller";
 import Submission from "../models/Submission";
 import { getAll, getOne } from "./handlerFactory";
+import catchAsync from "../utils/catchAsync";
+import mongoose from "mongoose";
 
 const testCasesSchema = z.array(testcaseSchema)
 
@@ -47,7 +49,7 @@ export const run = applyType(
                         status: "fail",
                         testcaseNo: i,
                         testcase,
-                        message: submission.stderr
+                        message: submission.stderr || submission.compile_output
                     })
                 }
             }
@@ -58,7 +60,7 @@ export const run = applyType(
                 const submission = executedUserSubmissions[i];
                 
                 if(submission.status.id >= 5) {
-                    throw new AppError(submission.stderr || "Please fix your code and run again", 417)
+                    throw new AppError(submission.stderr || submission.compile_output || "Please fix your code and run again", 417)
                 }
 
             }
@@ -103,7 +105,7 @@ export const submit = applyType(
                 testCasesPassed += 1
                 continue
             }
-            error = submission.stderr; 
+            error = submission.stderr || submission.compile_output; 
             break
         }
 
@@ -116,8 +118,8 @@ export const submit = applyType(
             testCasesPassed,
             error,
             lastExecutedTestcase: submission!.status.id !== 3 ?  testcases[i]._id : null,
-            memory: submission!.status.id !== 3 ? 'N/A' : `${(memory / 1000) / submissionsLength} MB`,
-            runtime: submission?.status.id !== 3 ? 'N/A' : `${(runtime * 1000) / submissionsLength} ms`,
+            memory: submission!.status.id !== 3 ? 'N/A' : `${((memory / 1000) / submissionsLength).toFixed(1)} MB`,
+            runtime: submission?.status.id !== 3 ? 'N/A' : `${Math.round((runtime * 1000) / submissionsLength)} ms`,
         }) 
 
         return res.status(201).json({
@@ -129,5 +131,56 @@ export const submit = applyType(
     }
 );
 
-export const getSubmissions = getAll(Submission)
-export const getSubmission = getOne(Submission)
+export const getSubmissionStatus = catchAsync(async (req, res, next) => {
+    const problemId = req.params.id;
+    const userId = req.user._id;
+
+    const submissions = await Submission.find({
+        $and: [
+            { user: userId },
+            { problem: new mongoose.Types.ObjectId(problemId) } 
+        ]
+    });
+
+    let status: 'todo' | 'attempted' | 'solved' = !submissions.length ? "todo" : "attempted";
+
+    function helper(i = 0) {
+        if(i === submissions.length || status === 'solved') return;
+
+        const submission = submissions[i];
+
+        if(submission.status === 'Accepted') {
+            status = 'solved';
+            return;
+        }
+
+        helper(i+1);
+    }
+
+    helper();
+
+    return res.status(200).json({
+        status: "success",
+        data: {
+            status
+        }
+    })
+})
+
+export const getSubmissions = getAll(Submission, [
+    {
+        path: "language",
+    }, 
+    { 
+        path: "lastExecutedTestcase" 
+    }
+])
+
+export const getSubmission = getOne(Submission, [
+    {
+        path: "language",
+    }, 
+    { 
+        path: "lastExecutedTestcase" 
+    }
+])

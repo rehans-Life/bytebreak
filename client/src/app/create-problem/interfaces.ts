@@ -39,6 +39,7 @@ export interface Problem {
   submissions: number
   accepted: number
   acceptanceRate: number
+  likes: number,
   sampleTestCases: Testcase[]
 }
 

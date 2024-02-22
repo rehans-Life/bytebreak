@@ -16,7 +16,6 @@ export default async function Layout({
         <ErrorBoundary FallbackComponent={FallbackError}>
             <Suspense fallback={<div className='bg-dark-layer-1 h-screen'></div>}>
                 <div className='bg-dark-fill-1 text-white h-screen'>
-                    <header className='text-white'>{slug}</header>
                     <Problem slug={slug}>
                         {children}
                     </Problem>

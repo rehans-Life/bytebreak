@@ -66,19 +66,30 @@ export interface SubmissionDoc {
   _id: string,
   problem: string
   user: string
-  language: string
+  language: Tag
   code: string
-  runtime: String
-  memory: String
+  runtime: string
+  memory: string
   status: StatusTypes
   testCasesPassed: number
   lastExecutedTestcase?: Testcase
   error?: string
+  createdAt: string
 }
 
 export interface Status {
   id: number,
   description: StatusTypes
+}
+
+export type ProblemStatus = "attempted" | "solved" | "todo";
+export type LikeRef =  "problem" | "comment";
+
+export interface Like {
+  _id: string
+  parent: string
+  user: string
+  ref: LikeRef
 }
 
 export interface Tag {
@@ -98,7 +109,7 @@ export interface TopicTag extends Tag {
   category: 'topic'
 }
 
-export interface TagWithConfig extends Tag {
+export interface TagWithConfig extends LanguageTag {
   defaultConfiguration: string  
 }
 

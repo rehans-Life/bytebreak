@@ -1,4 +1,4 @@
-import { Option } from '../components/select'
+import { Option } from '../app/components/select'
 
 interface Object {
   [key: string]: any

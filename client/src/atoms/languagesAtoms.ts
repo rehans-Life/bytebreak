@@ -3,6 +3,7 @@ import { TagWithConfig } from "../app/interfaces";
 import { Option } from "../app/components/select";
 
 export const languageAtom = atom<Option<string> | undefined>(undefined);
+export const languagesAtom = atom<TagWithConfig[]>([]);
 
 export const selectLanguageAtom = atom(null, (get, set, lang: TagWithConfig) => {
     set(languageAtom, {

@@ -1,8 +1,8 @@
 'use client'
 
 import React, { useState } from 'react'
-import { QueryClientProvider, QueryClient, MutationCache, QueryCache, Query } from '@tanstack/react-query'
-import { errorHandler } from '../app/utils/errorHandler'
+import { QueryClientProvider, QueryClient, MutationCache, QueryCache } from '@tanstack/react-query'
+import { errorHandler } from '../utils/errorHandler'
 
 export default function Provider({
   children,
@@ -18,8 +18,13 @@ export default function Provider({
     }),
     mutationCache: new MutationCache({
       onError: errorHandler,
+      onSuccess: (data, _, __, { meta }) => {
+        if (!meta?.onSuccess || typeof meta?.onSuccess !== 'function') return;
+        meta.onSuccess(data)
+      }
     })
-  }))
+  })
+  )
 
   return (
     <QueryClientProvider client={queryClient}>{children}

@@ -1,9 +1,8 @@
 import { Error, Schema, Types, model } from 'mongoose'
 import Problem from './Problem'
 import AppError from '../utils/appError'
-import { ITestCase } from './TestCase'
 
-const statuses = [
+export const statuses = [
   "Accepted",
   "Wrong Answer",
   "Time Limit Exceeded",
@@ -47,7 +46,7 @@ const SubmissionSchema = new Schema<ISubmission>(
     },
     language: {
       type: Number,
-      ref: 'Language',
+      ref: 'Tag',
       required: [true, 'a submission should be written in a specific language']
     },
     lastExecutedTestcase: {

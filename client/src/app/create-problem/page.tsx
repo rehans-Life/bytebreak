@@ -16,9 +16,9 @@ import { ProblemSchema } from './schemas'
 import { useAtomValue, useSetAtom } from 'jotai'
 import { tagsAtom, topicsAtom } from '../../atoms/tagAtoms'
 import { useMutation, useSuspenseQuery, useQueryClient, } from '@tanstack/react-query'
-import axios from '../utils/axios'
+import axios from '../../utils/axios'
 import { ApiSuccessResponse, Comment, LanguageTag, TopicTag } from '../interfaces'
-import createFormData from '@/app/utils/createFormData'
+import createFormData from '@/utils/createFormData'
 import DefaultForm from '@/app/components/defaultForm'
 import { AxiosError } from 'axios'
 import { useRouter } from 'next/navigation'
@@ -106,6 +106,7 @@ export default function Create() {
       queryClient.setQueryData(['problems', data.problem.slug], data.problem)
       queryClient.setQueryData(['editorial', data.problem.slug], data.editorial)
       router.push(`/problems/${data.problem.slug}`)
+      reset();
     },
     throwOnError: false,
   })
@@ -129,7 +130,7 @@ export default function Create() {
     },
   })
 
-  const { control, handleSubmit } = methods
+  const { control, handleSubmit, reset } = methods
 
   const addProblem: SubmitHandler<ProblemType> = async (problem) => {
     mutate(problem)

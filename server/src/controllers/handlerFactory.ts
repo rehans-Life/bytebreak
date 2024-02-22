@@ -1,10 +1,10 @@
 import { RequestHandler } from 'express'
-import { Model } from 'mongoose'
+import { Model, PopulateOptions } from 'mongoose'
 import catchAsync from '../utils/catchAsync'
 import AppError from '../utils/appError'
 import ApiFeatures from '../utils/apiFeatures'
 
-type FactoryHandler = (model: Model<any>) => RequestHandler
+type FactoryHandler = (model: Model<any>, populateOptions?: PopulateOptions | PopulateOptions[]) => RequestHandler
 
 export const createOne: FactoryHandler = (model) =>
   catchAsync(async (req, res, _) => {
@@ -15,7 +15,7 @@ export const createOne: FactoryHandler = (model) =>
     })
   })
 
-export const getAll: FactoryHandler = (model) =>
+export const getAll: FactoryHandler = (model, populateOptions) =>
   catchAsync(async (req, res, next) => {
     const feautres = new ApiFeatures(model.find(), req.query)
       .paginate()
@@ -23,7 +23,7 @@ export const getAll: FactoryHandler = (model) =>
       .select()
       .filter()
 
-    const docs = await feautres.query
+    const docs = await feautres.query.populate(populateOptions || []);
 
     return res.status(200).json({
       status: 'success',
@@ -31,9 +31,9 @@ export const getAll: FactoryHandler = (model) =>
     })
   })
 
-export const getOne: FactoryHandler = (model) =>
+export const getOne: FactoryHandler = (model, populateOptions) =>
   catchAsync(async (req, res, _) => {
-    const doc = await model.findById(req.params.id)
+    const doc = await model.findById(req.params.id).populate(populateOptions || [])
 
     if (!doc) throw new AppError('Document not found', 404)
 

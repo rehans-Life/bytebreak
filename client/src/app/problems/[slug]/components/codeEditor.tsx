@@ -1,63 +1,21 @@
 'use client';
 
-import React, { useCallback, useEffect } from 'react'
+import React, { useCallback } from 'react'
 import { Editor as MonacoEditor } from '@monaco-editor/react'
 import Select from '@/app/components/select';
-import { convert } from '@/app/utils/convert';
-import { TagWithConfig } from '@/app/interfaces';
+import { convert } from '@/utils/convert';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
-import { codeAtom, languageAtom, selectLanguageAtom } from '../../../../atoms/languagesAtoms';
+import { codeAtom, languageAtom, languagesAtom, selectLanguageAtom } from '@/atoms/languagesAtoms';
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 import { IoMdRewind } from "@react-icons/all-files/io/IoMdRewind";
-import { useMutation } from '@tanstack/react-query';
-import { runCode, submitCode } from '@/app/utils/api';
-import { Problem } from '@/app/create-problem/interfaces';
 
-export default function CodeEditor({
-    languages,
-    problem,
-}: { languages: TagWithConfig[], problem: Problem }) {
+export default function CodeEditor() {
 
     const [codes, setCodes] = useAtom(codeAtom)
 
     const lang = useAtomValue(languageAtom)
+    const languages = useAtomValue(languagesAtom)
     const setLang = useSetAtom(selectLanguageAtom);
-
-    const run = useMutation({
-        mutationFn: runCode,
-        onSuccess(data) {
-            console.log(data)
-        },
-        throwOnError: false
-    })
-
-    const submit = useMutation({
-        mutationFn: submitCode,
-        onSuccess(data) {
-            console.log(data)
-        },
-        throwOnError: false
-    })
-
-    const onRun = async () => {
-        const languageId = languages.find(({ slug }) => slug === lang?.value)?._id!;
-        run.mutate({
-            code: codes[lang?.value || ""] || "",
-            languageId,
-            problemId: problem._id,
-            testcases: problem.sampleTestCases.map(({ input, output }) => ({ input, output })),
-
-        })
-    }
-
-    const onSubmit = async () => {
-        const languageId = languages.find(({ slug }) => slug === lang?.value)?._id!;
-        submit.mutate({
-            code: codes[lang?.value || ""] || "",
-            languageId,
-            problemId: problem._id
-        })
-    }
 
     const getLanguageConfig = useCallback(
         (slug: string) => {
@@ -65,11 +23,6 @@ export default function CodeEditor({
         },
         [languages],
     )
-
-
-    useEffect(() => {
-        setLang(languages[0]);
-    }, []);
 
     return (
         <div>
@@ -112,8 +65,6 @@ export default function CodeEditor({
                 className='h-64'
                 language={lang?.value}
             />
-            <button onClick={onRun}>Run</button>
-            <button onClick={onSubmit}>Submit</button>
         </div>
     )
 }

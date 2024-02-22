@@ -1,4 +1,4 @@
-import { Option } from "../components/select";
+import { Option } from "../app/components/select";
 
 export function convert<VT>(data: any[], field: string, value: string): Option<VT>[] {
     return data.map<Option<VT>>((data) => {

@@ -6,6 +6,7 @@ import mongoose, {
   model,
 } from 'mongoose'
 import AppError from '../utils/appError'
+import capitalize from "capitalize";
 
 export interface ILike {
   parent: Types.ObjectId
@@ -35,7 +36,7 @@ const LikeSchema = new Schema<ILike, ILikeModel, ILikeMethods>(
     },
     ref: {
       type: String,
-      enum: ['question', 'comment'],
+      enum: ['problem', 'comment'],
     },
   },
   {
@@ -43,58 +44,6 @@ const LikeSchema = new Schema<ILike, ILikeModel, ILikeMethods>(
   },
 )
 
-LikeSchema.method('findParent', async function () {
-  const parentDoc: HydratedDocument<any, any> = await mongoose
-    .model(this.ref)
-    .findById(this.parent)
-
-  if (!parentDoc) {
-    throw new AppError('There is no parent corresponding to the like', 404)
-  }
-  return parentDoc
-})
-
-LikeSchema.post('save', async function (doc, next) {
-  try {
-    const parent = await doc.findParent()
-
-    parent.likes += 1
-    parent.save()
-
-    next()
-  } catch (err) {
-    next(
-      new AppError(
-        err instanceof Error && err?.message
-          ? err.message
-          : 'An error occured while liking the comment please try again',
-        500,
-      ),
-    )
-  }
-})
-
-LikeSchema.post(
-  /delete/i,
-  async function (doc: HydratedDocument<ILike, ILikeMethods>, next) {
-    try {
-      const parent = await doc.findParent()
-
-      parent.likes -= 1
-      parent.save()
-
-      next()
-    } catch (err) {
-      next(
-        new AppError(
-          err instanceof Error && err?.message
-            ? err.message
-            : 'An error occured while unliking the comment please try again',
-          500,
-        ),
-      )
-    }
-  },
-)
+LikeSchema.index({ parent: 1, user: 1 }, { unique: true });
 
 export default model<ILike, ILikeModel>('Like', LikeSchema)

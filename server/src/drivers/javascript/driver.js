@@ -2,6 +2,7 @@ const { stdin, stdout, stderr, exit } = require('process')
 
 let inputsData = ''
 let funcName = ''
+let returnType = '';
 let params = []
 let args = ''
 
@@ -10,7 +11,7 @@ stdin.on('data', (data) => {
 })
 
 stdin.on('end', () => {
-  ;[funcName, params, args] = inputsData.trim().split('|')
+  ;[funcName, params, args, returnType] = inputsData.trim().split('|')
   params = JSON.parse(params.replace(/\\/g, ''))
   main()
 })
@@ -58,7 +59,11 @@ function main() {
 
   const output = eval(funcName)(...convertedArgs)
 
-  stdout.write(output.toString())
+  if(output instanceof Array) {
+    stdout.write(JSON.stringify(output).replace(/\"/g, ""))
+  } else {
+    stdout.write(output.toString())
+  }
 }
 
 

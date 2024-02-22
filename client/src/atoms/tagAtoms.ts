@@ -1,5 +1,5 @@
 import { atom } from 'jotai'
-import { LanguageTag, Tag, TopicTag } from '../app/interfaces'
+import { LanguageTag, TopicTag } from '../app/interfaces'
 
 export const tagsAtom = atom(
   (get) => [...get(languagesAtom), ...get(topicsAtom)],

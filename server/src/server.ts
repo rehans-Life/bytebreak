@@ -12,6 +12,7 @@ const MONGO_URI = keys.DB_URI
 ;(async () => {
   try {
     await mongoose.connect(MONGO_URI)
+    
     app.listen(PORT, () =>
       console.log(`Server is listening for requests on PORT ${PORT}`),
     )

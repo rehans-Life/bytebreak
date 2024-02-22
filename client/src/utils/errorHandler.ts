@@ -1,6 +1,6 @@
 import { AxiosError } from "axios"
 import { ToastOptions, toast } from "react-hot-toast"
-import { ApiErrorResponse } from "../interfaces"
+import { ApiErrorResponse } from "../app/interfaces"
 
 export const errorHandler = ((error: Error, _: any, { errorMsg }: { onClose?: () => any, errorMsg?: string } & any) => {
     const toastOptions: ToastOptions = {

@@ -8,15 +8,15 @@ export default function TooltipContainer({
 }: {
     children: ReactNode,
     message: string,
-    onClick: MouseEventHandler<HTMLButtonElement>
+    onClick?: MouseEventHandler<HTMLButtonElement>
 }) {
     return (
         <TooltipProvider>
-            <Tooltip>
-                <TooltipTrigger type='button' className='p-1' onClick={onClick}>
+            <Tooltip delayDuration={200}>
+                <TooltipTrigger type='button' className='p-0' onClick={onClick}>
                     {children}
                 </TooltipTrigger>
-                <TooltipContent className='bg-dark-layer-3 border-dark-border'>
+                <TooltipContent className='bg-dark-layer-3 border-dark-border px-2 py-1.5'>
                     <p className='text-xs text-white'>{message}</p>
                 </TooltipContent>
             </Tooltip>

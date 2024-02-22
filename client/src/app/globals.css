@@ -100,12 +100,17 @@ body {
   overflow-x: hidden;
 }
 
-* {
-  scrollbar-color: rgb(48, 48, 48);
+tbody tr:nth-child(odd) {
+  background-color: rgb(61, 61, 61);
 }
 
-*::-webkit-scrollbar-track {
-  background: rgb(48, 48, 48);
+
+div, body  {
+  scrollbar-color: rgb(138, 138, 138) rgb(61, 61, 61);
+}  
+
+td {
+  padding: 5px 15px;
 }
 
 a {
@@ -181,4 +186,19 @@ a {
 .md-editor-toolbar button svg {
   height: 16px;
   width: 16px;
+}
+
+.section-tab:not(:last-child)::before {
+  content: "";
+  position: absolute;
+  height: 60%;
+  width: 0.1rem;
+  right: 0;
+  border-radius: 50%;
+  background-color: hsla(0,0%,100%,.14);
+  opacity: 0.75;
+}
+
+.section-tab:not(:last-child):hover::before {
+  display: none;
 }

@@ -1,4 +1,4 @@
-import { dart, javascript, python, typescript } from "../drivers/concat";
+import { cpp, java, javascript, python } from "../drivers/concat";
 import { ProblemConfig } from "../models/Problem";
 import Tag from "../models/Tag";
 import AppError from "../utils/appError";
@@ -12,6 +12,7 @@ export interface Submission {
     memory: number,
     stderr: string | null,
     message: string | null,
+    compile_output: string,
     status: Status
 }
 
@@ -51,12 +52,12 @@ export const batchSubmission = async (source_code: string,
         case 'python':
             base64Code = python(source_code);    
             break;   
-        case 'typescript':
-            base64Code = typescript(source_code);    
-            break;
-        case 'dart':
-            base64Code = dart(source_code);    
-            break;        
+        case 'java':
+            base64Code = java(source_code);    
+            break;    
+        case 'cpp':
+            base64Code = cpp(source_code, config.funcName);    
+            break;  
         default:
             base64Code = ''
             break;
@@ -65,7 +66,7 @@ export const batchSubmission = async (source_code: string,
     const submissions = testCases.map(({
         input, output
     }) => {
-        const stdin = Buffer.from(`${config.funcName}|${JSON.stringify(config.params)}|${input}`).toString("base64");
+        const stdin = Buffer.from(`${config.funcName}|${JSON.stringify(config.params)}|${input}|${config.returnType}`).toString("base64");
         const expected_output = Buffer.from(output).toString("base64")
 
         return {

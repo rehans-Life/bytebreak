@@ -83,7 +83,7 @@ export const protect: RequestHandler = catchAsync(async (req, _, next) => {
 
 export const signup: RequestHandler = catchAsync(async (req, res, next) => {
   delete req.body.role
-  // delete req.body.active
+  delete req.body.active
   const user = await User.create(req.body)
   createSendToken(user, 201, res)
 })

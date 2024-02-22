@@ -1,5 +1,5 @@
 import { Param, Types, getDefaultCodeConfiguration } from 'lang-code-configuration'
-import { ProblemConfig } from '../create-problem/interfaces'
+import { ProblemConfig } from '../app/create-problem/interfaces'
 import { langs } from 'lang-code-configuration/data'
 
 const generateCodeConfig = function(slug: langs, config: ProblemConfig) : string {

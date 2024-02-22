@@ -9,6 +9,9 @@ import {
 import multer from 'multer'
 import AppError from '../utils/appError'
 import { protect } from '../controllers/authController'
+import { setRef } from '../controllers/generalController'
+import likeRoutes from './likeRoutes'
+import submissionRoutes from './submissionRoutes';
 
 const storage = multer.memoryStorage()
 const upload = multer({
@@ -25,14 +28,20 @@ const upload = multer({
 const router = Router()
 
 router
-  .route('/')
-  .get(getProblems)
-  .post(protect, upload.single('testcases'), createProblem)
+.route('/')
+.get(getProblems)
+.post(protect, upload.single('testcases'), createProblem)
 
 router.route('/:identifier').get(getProblem);
 
 router.route('/:identifier/defaultConfigurations').get(getDefaultConfigurations);
 
 router.route('/:identifier/editorial').get(getEditorial);
+
+router.use("/:id/submissions", submissionRoutes);
+
+router.use(setRef("problem"));
+
+router.use("/:id", likeRoutes);
 
 export default router

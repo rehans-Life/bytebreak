@@ -117,7 +117,7 @@ const Option = function <VT>({
         )}
       </div>
       {selected && (
-        <IoCheckmark className="text-blue-s dark:text-dark-blue-s h-4 w-4" />
+        <IoCheckmark className="text-dark-blue-s h-4 w-4" />
       )}
     </div>
   )

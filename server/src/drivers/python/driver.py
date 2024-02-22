@@ -1,5 +1,6 @@
 from sys import stderr, stdin, stdout, exit
-from json import loads 
+from json import loads, dumps 
+import re
 
 class Solution: pass
 
@@ -49,6 +50,10 @@ def main():
     solution = Solution()
 
     output = getattr(solution, funcName)(*convertedArgs)
-    stdout.write(str(output))
+
+    if(isinstance(output, list)):
+        stdout.write(re.sub("\s|\"", "", dumps(output)))
+    else:
+        stdout.write(str(output))
 
 main()

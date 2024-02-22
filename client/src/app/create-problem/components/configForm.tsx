@@ -6,7 +6,7 @@ import Editor from './editor'
 import Input from '@/app/components/input'
 import { FiPlus } from '@react-icons/all-files/fi/FiPlus'
 import { useToast } from '@/components/ui/use-toast'
-import styles from '../styles'
+import styles from '../../styles'
 
 export default function ConfigForm() {
   const { register, control } = useFormContext<ProblemType>()

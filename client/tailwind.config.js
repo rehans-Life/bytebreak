@@ -44,6 +44,8 @@ module.exports = {
         'brand-orange': 'rgb(255 161 22)',
         'brand-orange-s': 'rgb(193, 122, 15)',
         'dark-yellow': 'rgb(255 192 30)',
+        'dark-red': 'rgb(255 55 100)',
+        'dark-red-opague': 'rgba(255 55 100 0.9)',
         'dark-pink': 'rgb(255 55 95)',
         olive: 'rgb(0, 184, 163)',
         'dark-green-s': 'rgb(44 187 93)',
