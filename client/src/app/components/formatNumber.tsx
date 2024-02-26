@@ -22,7 +22,7 @@ export default function FormatNumber({
     } else if (stringifiedNum.length >= 4 && stringifiedNum.length <= 6) {
         unit = "K";
 
-        formattedNum = `${splitNum[0]}${splitNum[1][0] !== "0" ? `.${splitNum[1][0]}` : ""}`;
+        formattedNum = `${splitNum[0]}${splitNum[1]?.[0] !== "0" ? `.${splitNum[1]?.[0]}` : ""}`;
 
     } else {
         formattedNum = splitNum[0];

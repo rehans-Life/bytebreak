@@ -6,9 +6,11 @@ export default function Input({
   label,
   inputRef,
   inputStyles,
+  labelStyles,
   ...props
 }: UseFormRegisterReturn<any> & {
   label: string
+  labelStyles?: string,
   inputStyles?: string
   inputRef: RefCallBack
   ref: RefCallBack
@@ -19,7 +21,7 @@ export default function Input({
     <div className="flex flex-col gap-y-1.5">
       <label
         htmlFor={uid}
-        className="text-white text-sm sm:text-normal font-medium"
+        className={`${labelStyles} text-white text-sm sm:text-normal font-medium`}
       >
         {label}
       </label>

@@ -25,7 +25,7 @@ import { useRouter } from 'next/navigation'
 import '@uiw/react-markdown-editor/markdown-editor.css';
 import '@uiw/react-markdown-preview/markdown.css';
 import dynamic from 'next/dynamic'
-import MarkdownSkeleton from '../components/markdown-skeleton'
+import MarkdownSkeleton from '../../skeletons/markdown-skeleton'
 
 const MarkdownEditor = dynamic(
   () => import("@uiw/react-markdown-editor").then((mod) => mod.default),

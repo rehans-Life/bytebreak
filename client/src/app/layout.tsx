@@ -4,6 +4,7 @@ import { Toaster } from '@/components/ui/toaster'
 import { Toaster as HotToaster } from 'react-hot-toast'
 import ReactQueryProvider from '../providers/queryClientProvider'
 import { Provider as JotaiProvider } from 'jotai'
+import { ThemeProvider } from '@/providers/themeProvider'
 
 export const metadata: Metadata = {
   title: 'ByteBreak',
@@ -21,11 +22,15 @@ export default function RootLayout({
         <head>
         </head>
         <body className="h-screen bg-dark-layer-2">
-          <Toaster />
-          <ReactQueryProvider>
-            {children}
-          </ReactQueryProvider>
-          <HotToaster />
+          <ThemeProvider
+            forcedTheme='dark'
+          >
+            <Toaster />
+            <ReactQueryProvider>
+              {children}
+            </ReactQueryProvider>
+            <HotToaster />
+          </ThemeProvider>
         </body>
       </html>
     </JotaiProvider>

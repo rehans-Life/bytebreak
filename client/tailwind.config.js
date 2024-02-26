@@ -34,6 +34,7 @@ module.exports = {
         'dark-label-2': '#eff1f6bf',
         'dark-border': '#f7faff1f',
         'dark-divider-border-2': 'rgb(61, 61, 61)',
+        'code-background': '#1E1E1E',
         'dark-fill-2': 'hsla(0,0%,100%,.14)',
         'dark-fill-3': 'hsla(0,0%,100%,.1)',
         'dark-fill-1': '#0f0f0f',

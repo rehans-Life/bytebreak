@@ -1,23 +1,30 @@
 'use client';
 
-import { useMutation, useQuery, useSuspenseQueries } from '@tanstack/react-query'
+import { useSuspenseQueries } from '@tanstack/react-query'
 import React, { ReactNode, useState } from 'react'
-import CodeEditor from './components/codeEditor';
-import { getDefaultConfigurations, getLike, getProblem, likeDoc, unlikeDoc } from '../../../utils/api';
+import CodeEditor from './components/code-editor';
+import { getDefaultConfigurations, getProblem } from '@/utils/api';
 import { Problem } from '@/app/create-problem/interfaces';
-import { useAtom, useAtomValue, useSetAtom } from 'jotai';
-import { hasLikedAtom, problemAtom } from '@/atoms/problemAtoms';
+import { useAtomValue, useSetAtom } from 'jotai';
+import { problemAtom } from '@/atoms/problemAtoms';
 import Header from './components/header';
 import { languagesAtom, selectLanguageAtom } from '@/atoms/languagesAtoms';
-import { Like, TagWithConfig } from '../../interfaces';
+import { TagWithConfig } from '../../interfaces';
 import { Section, SectionBody, SectionHeader, SectionFooter, SectionTab } from '@/app/components/section';
 import { IoDocumentTextOutline } from "@react-icons/all-files/io5/IoDocumentTextOutline";
 import { HiOutlineBookOpen } from "@react-icons/all-files/hi/HiOutlineBookOpen";
 import { IoDocumentsOutline } from "@react-icons/all-files/io5/IoDocumentsOutline";
 import { atomWithLocation } from 'jotai-location'
 import LeftFooter from './components/left-footer';
+import { useRouter } from 'next/navigation';
+import { FormProvider, useForm } from 'react-hook-form';
+import { TestCasesType } from './interfaces';
+import TestcasesSection from './components/testcases-section';
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
+import ProblemInfo from './components/problem-info';
 
 const locationAtom = atomWithLocation()
+const handleStyle = "before:content-[''] before:absolute before:left-0 before:right-0 before:ml-auto before:mr-auto before:bg-dark-gray-6 before:rounded-md";
 
 export default function Problem({
     slug,
@@ -26,6 +33,7 @@ export default function Problem({
     children: ReactNode,
     slug: string
 }) {
+    const router = useRouter();
 
     const location = useAtomValue(locationAtom)
     const [currTab, setCurrTab] = useState(location.pathname?.split("/")[location.pathname?.split("/").length - 1])
@@ -34,7 +42,7 @@ export default function Problem({
     const setLanguagesConfigs = useSetAtom(languagesAtom)
     const setLang = useSetAtom(selectLanguageAtom)
 
-    const [{ data: { _id } }] = useSuspenseQueries({
+    const [{ data: { _id, sampleTestCases } }] = useSuspenseQueries({
         queries: [
             {
                 meta: {
@@ -59,46 +67,57 @@ export default function Problem({
         ]
     })
 
+    const methods = useForm<TestCasesType>({
+        defaultValues: {
+            testcases: sampleTestCases.map((testcase) => {
+                const input = testcase.input
+                    .split("\n")
+                    .reduce<{ [key: number]: string }>(
+                        (acc, value, index) => {
+                            acc[index] = value;
+                            return acc;
+                        }, {});
+                return {
+                    input, output: testcase.output
+                }
+            })
+        }
+    })
+
     return (
-        <div className='p-3 flex flex-col gap-y-3'>
-            <Header />
-            <div>
-                <Section>
-                    <SectionHeader>
-                        <div onClick={() => setCurrTab("description")}>
-                            <SectionTab href={`/problems/${slug}/description`} active={currTab === 'description'}>
-                                <div className='text-dark-blue-s text-lg'>
-                                    <IoDocumentTextOutline />
-                                </div>
-                                Description
-                            </SectionTab>
-                        </div>
-                        <div onClick={() => setCurrTab("editorial")}>
-                            <SectionTab href={`/problems/${slug}/editorial`} active={currTab === 'editorial'}>
-                                <div className='text-dark-yellow text-lg'>
-                                    <HiOutlineBookOpen />
-                                </div>
-                                Editorial
-                            </SectionTab>
-                        </div>
-                        <div onClick={() => setCurrTab("submissions")}>
-                            <SectionTab href={`/problems/${slug}/submissions`} active={currTab === 'submissions'}>
-                                <div className="text-dark-green-s text-lg">
-                                    <IoDocumentsOutline />
-                                </div>
-                                Submissions
-                            </SectionTab>
-                        </div>
-                    </SectionHeader>
-                    <SectionBody>
+        <FormProvider {...methods}>
+            <div className='flex sm:hidden h-auto flex-col gap-y-2 px-3 py-2'>
+                <Header />
+                <div className='flex flex-col gap-y-4 sm:hidden'>
+                    <ProblemInfo _id={_id} slug={slug}>
                         {children}
-                    </SectionBody>
-                    <SectionFooter>
-                        <LeftFooter problemId={_id}></LeftFooter>
-                    </SectionFooter>
-                </Section>
-                <CodeEditor />
+                    </ProblemInfo>
+                    <CodeEditor />
+                    <TestcasesSection />
+                </div>
             </div>
-        </div>
+            <div className='sm:flex hidden h-screen flex-col gap-y-2 px-3 py-2'>
+                <Header />
+                <ResizablePanelGroup direction='horizontal' className=''>
+                    <ResizablePanel defaultSize={40}>
+                        <ProblemInfo _id={_id} slug={slug}>
+                            {children}
+                        </ProblemInfo>
+                    </ResizablePanel>
+                    <ResizableHandle className={`w-1.5 relative bg-dark-layer-2 ${handleStyle} before:w-[50%] before:h-6`} />
+                    <ResizablePanel defaultSize={60}>
+                        <ResizablePanelGroup direction="vertical">
+                            <ResizablePanel defaultSize={60} minSize={7.5} collapsedSize={7.5} collapsible={true}>
+                                <CodeEditor />
+                            </ResizablePanel>
+                            <ResizableHandle className={`${handleStyle} pt-1.5 bg-dark-layer-2 before:w-6 before:h-[50%] before:top-0 before:bottom-0 before:mt-auto before:mb-auto`} />
+                            <ResizablePanel defaultSize={40} minSize={7.5} collapsedSize={7.5} collapsible={true}>
+                                <TestcasesSection />
+                            </ResizablePanel>
+                        </ResizablePanelGroup>
+                    </ResizablePanel>
+                </ResizablePanelGroup>
+            </div>
+        </FormProvider>
     )
 }

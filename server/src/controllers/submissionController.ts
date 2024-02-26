@@ -23,7 +23,7 @@ const RunBodySchema = SubmitBodySchema.extend({
 
 export const run = applyType(
         RunBodySchema, 
-        async (req, res, next) => {
+        async (req, res) => {
             const { languageId, code, testcases, problemId } = req.body;
             const problem = await Problem.findById(problemId).select("config solution");
 
@@ -37,7 +37,7 @@ export const run = applyType(
 
                 if(submission.status.id === 4) {
                     return res.status(409).json({
-                        status: "fail",
+                        status: submission.status.description,
                         testcaseNo: i,
                         testcase,
                         message: 'Solution does not exist for the given testcase'
@@ -46,7 +46,7 @@ export const run = applyType(
 
                 if(submission.status.id >= 5) {
                     return res.status(409).json({
-                        status: "fail",
+                        status: submission.status.description,
                         testcaseNo: i,
                         testcase,
                         message: submission.stderr || submission.compile_output
@@ -58,9 +58,13 @@ export const run = applyType(
             
             for (let i = 0; i < executedUserSubmissions.length; i++) {
                 const submission = executedUserSubmissions[i];
+                submission.testcase = testcases[i];
                 
                 if(submission.status.id >= 5) {
-                    throw new AppError(submission.stderr || submission.compile_output || "Please fix your code and run again", 417)
+                    return res.status(417).json({
+                        status: submission.status.description,
+                        message: submission.stderr || submission.compile_output || "Please fix your code and run again"
+                    })
                 }
 
             }

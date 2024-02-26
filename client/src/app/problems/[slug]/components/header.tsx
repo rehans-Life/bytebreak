@@ -1,46 +1,135 @@
 'use client'
 
-import React from 'react'
+import React, { useEffect } from 'react'
 import Tooltip from "@/app/components/tooltip";
 import { FiSettings } from '@react-icons/all-files/fi/FiSettings';
 import { IoCloudUpload } from '@react-icons/all-files/io5/IoCloudUpload';
 import { FaPlay } from '@react-icons/all-files/fa/FaPlay';
-import { useAtomValue } from 'jotai';
+import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { userAtom } from '@/atoms/userAtom';
-import { problemAtom } from '@/atoms/problemAtoms';
+import { fontSizeAtom, problemAtom, tabSpaceAtom } from '@/atoms/problemAtoms';
 import { codeAtom, languageAtom, languagesAtom } from '@/atoms/languagesAtoms';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { runCode, submitCode } from '@/utils/api';
+import { useFormContext } from 'react-hook-form';
+import { TestCasesType } from '../interfaces';
+import { CodeError, InvalidTestcase, executionResultAtom, testcaseTabAtom } from '@/atoms/testcaseAtoms';
+import { useRouter } from 'next/navigation';
+import { SubmissionDoc } from '@/app/interfaces';
+import { AxiosError } from 'axios';
+import { CgSpinner } from '@react-icons/all-files/cg/CgSpinner';
+import toast from 'react-hot-toast';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog"
+import Select, { Option } from '@/app/components/select';
+
+export const fontSizes: Option<number>[] = Array(10).fill(0).map((_, i) => {
+    const size = 12 + i;
+    return {
+        label: `${size}px`,
+        value: size
+    }
+})
+
+export const tabSpaces: Option<number>[] = [
+    {
+        label: '4 spaces',
+        value: 4
+    },
+    {
+        label: '2 spaces',
+        value: 2
+    }
+]
+
+export const isExecutingAtom = atom<boolean>(false);
 
 export default function Header() {
+    const router = useRouter();
+    const queryClient = useQueryClient()
+
     const user = useAtomValue(userAtom);
     const problem = useAtomValue(problemAtom)
     const codes = useAtomValue(codeAtom)
     const language = useAtomValue(languageAtom)
     const languages = useAtomValue(languagesAtom);
 
+    const setTestcaseTab = useSetAtom(testcaseTabAtom);
+    const setExecutionResult = useSetAtom(executionResultAtom);
+    const setExecxutingState = useSetAtom(isExecutingAtom);
+
+    const [fontSize, setFontSize] = useAtom(fontSizeAtom);
+    const [tabSpace, setTabSpace] = useAtom(tabSpaceAtom);
+
+    const { getValues } = useFormContext<TestCasesType>();
+
     const run = useMutation({
+        onMutate() {
+            return { skipErrorHandling: true }
+        },
         mutationFn: runCode,
         throwOnError: false
     })
 
     const submit = useMutation({
+        meta: {
+            onSuccess: (submission: SubmissionDoc) => {
+                queryClient.setQueryData(['submissions', submission._id], submission);
+                router.push(`/problems/${problem?.slug}/submissions/${submission._id}`);
+            }
+        },
         mutationFn: submitCode,
         throwOnError: false
     })
 
-    const onRun = async () => {
-        const languageId = languages.find(({ slug }) => slug === language?.value)?._id!;
-        run.mutate({
-            code: codes[language?.value || ""] || "",
-            languageId,
-            problemId: problem!._id,
-            testcases: problem!.sampleTestCases.map(({ input, output }) => ({ input, output })),
+    useEffect(() => {
+        console.log(run.isPending)
+        setExecxutingState(run.isPending);
+    }, [run.isPending]);
 
+    const onRun = async () => {
+        if (run.isPending || submit.isPending) return;
+
+        const languageId = languages.find(({ slug }) => slug === language?.value)?._id!;
+        const testcases = getValues("testcases").map(({ input, output }) => {
+            return {
+                input: Object.values(input).reduce((acc, input, i) => !i ? input : `${acc}\n${input}`, ''),
+                output,
+            }
         })
+        setTestcaseTab(1);
+        setExecutionResult(null);
+        try {
+            const res = await run.mutateAsync({
+                code: codes[language?.value || ""] || "",
+                languageId,
+                problemId: problem!._id,
+                testcases: testcases,
+            })
+            setExecutionResult(res)
+        } catch (err) {
+            const error = err as AxiosError
+
+            if (error.response && [409, 417].some((code) => error.response?.status === code)) {
+                (error.response?.data as any).code = error.response.status;
+                const data = error!.response!.data as (InvalidTestcase | CodeError)
+                console.log(data);
+                setExecutionResult(data);
+            } else {
+                toast.error(error.message)
+                setTestcaseTab(0);
+            }
+        }
     }
 
     const onSubmit = async () => {
+        if (run.isPending || submit.isPending) return;
+
         const languageId = languages.find(({ slug }) => slug === language?.value)?._id!;
         submit.mutate({
             code: codes[language?.value || ""] || "",
@@ -50,9 +139,14 @@ export default function Header() {
     }
 
     return (
-        <div className='flex items-center flex-col xs:flex-row justify-between px-2 gap-y-3'>
+        <div className='flex items-center flex-col xs:flex-row justify-between px-4 gap-y-3'>
             <img src="/logo.png" className='h-5 w-5 object-contain' alt="logo" />
-            <div className='flex items-center gap-x-[2px]'>
+            <div className='flex items-center relative overflow-hidden gap-x-[2px]'>
+
+                <div className={`absolute ml-auto mr-auto left-0 right-0 h-full rounded-md ${submit.isPending || run.isPending ? 'w-full' : 'w-0'} overflow-hidden bg-gray-8 flex items-center justify-center gap-x-1.5 text-dark-gray-6 text-sm transition-all ease-out duration-100`}>
+                    <CgSpinner className='text-lg animate-spin dark-gray-6' />
+                    Pending...
+                </div>
                 <Tooltip message={'Run'} onClick={() => { onRun() }}>
                     <div className={`flex items-center gap-x-3 hover:bg-dark-divider-border-2 bg-gray-8 px-2.5 py-1.5 font-medium rounded-bl-md rounded-tl-md ease-out duration-100 transition-all`}>
                         <div className='text-dark-gray-8'>
@@ -68,13 +162,32 @@ export default function Header() {
                     </div>
                 </Tooltip>
             </div>
-            <div className='flex items-center gap-x-3'>
-                <Tooltip message={'Settings'} onClick={function (event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void {
-                }}>
-                    <div >
-                        <FiSettings />
-                    </div>
-                </Tooltip>
+            <div className='flex items-center gap-x-4'>
+                <Dialog>
+                    <DialogTrigger asChild>
+                        <Tooltip message={'Settings'} onClick={function (event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void {
+                        }}>
+                            <div >
+                                <FiSettings className="text-dark-label-2" />
+                            </div>
+                        </Tooltip>
+                    </DialogTrigger>
+                    <DialogContent className='bg-dark-layer-2 border-0 text-white'>
+                        <DialogTitle>Editor Settings</DialogTitle>
+                        <DialogDescription>
+                            <div className='gap-y-5 flex flex-col py-3'>
+                                <div className='flex items-center justify-between'>
+                                    <div className='text-dark-label-2 text-sm font-medium'>Font Size</div>
+                                    <Select options={fontSizes} enableSearch={false} isMulti={false} replaceName={true} undefined={false} value={fontSize} onChange={(option) => setFontSize(option)} menuHeight='h-[150px]' menuWidth='w-full' />
+                                </div>
+                                <div className='flex items-center justify-between'>
+                                    <div className='text-dark-label-2 text-sm font-medium'>Tab Spaces</div>
+                                    <Select options={tabSpaces} enableSearch={false} isMulti={false} replaceName={true} undefined={false} value={tabSpace} onChange={(option) => setTabSpace(option)} />
+                                </div>
+                            </div>
+                        </DialogDescription>
+                    </DialogContent>
+                </Dialog>
                 <div>
                     <img className='h-5 w-5 rounded-full cursor-pointer' src={user.photo || "/default.png"} alt="Profile Photo" />
                 </div>

@@ -72,7 +72,7 @@ export default function LeftFooter({
     })
 
     return (
-        <div className='flex items-center flex-wrap gap-x-3 gap-y-2'>
+        <div className='flex items-center gap-x-3 gap-y-2'>
             <div className='flex items-center gap-x-3'>
                 <button
                     disabled={like.isPending || unLike.isPending || isLiked.isFetching} onClick={() => {

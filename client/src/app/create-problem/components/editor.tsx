@@ -8,10 +8,11 @@ import { languagesAtom } from '../../../atoms/tagAtoms'
 import { convert } from '@/utils/convert'
 import RestrictedEditor from '@/app/components/restricted-editor'
 import generateCodeConfig from '@/utils/generateCodeConfig'
-import { IoMdRewind } from '@react-icons/all-files/io/IoMdRewind'
 import TooltipContainer from '@/app/components/tooltip'
 import { CgFormatLeft } from "@react-icons/all-files/cg/CgFormatLeft";
 import { editor } from 'monaco-editor'
+import { RiArrowGoBackLine } from "@react-icons/all-files/ri/RiArrowGoBackLine";
+
 
 interface LangConfig {
   restrictedLines: number[],
@@ -124,7 +125,7 @@ export default function Editor() {
 
   return (
     <>
-      <div className="rounded-tl-md flex justify-between items-center py-2 px-3 bg-dark-layer-2 rounded-tr-md">
+      <div className="rounded-tl-md flex justify-between items-center py-2 px-3 bg-code-background border-b border-dark-border rounded-tr-md">
         <Select
           isMulti={false}
           enableSearch={false}
@@ -165,7 +166,7 @@ export default function Editor() {
             }}
             message='Reset to default code defination'
           >
-            <IoMdRewind className='text-white' size={18} />
+            <RiArrowGoBackLine className='text-white' size={18} />
           </TooltipContainer>
         </div>
       </div>
@@ -188,6 +189,9 @@ export default function Editor() {
         options={{
           formatOnPaste: false,
           automaticLayout: true,
+          minimap: {
+            enabled: false
+          },
           padding: {
             top: 15,
           },

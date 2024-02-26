@@ -2,15 +2,26 @@ import { AxiosError } from "axios"
 import { ToastOptions, toast } from "react-hot-toast"
 import { ApiErrorResponse } from "../app/interfaces"
 
-export const errorHandler = ((error: Error, _: any, { errorMsg }: { onClose?: () => any, errorMsg?: string } & any) => {
-    const toastOptions: ToastOptions = {
-      position: 'top-center',
-      style: {
-        background: '#333',
-        color: '#fff',
-      },
-    }
+export const toastOptions: ToastOptions = {
+  position: 'top-center',
+  style: {
+    background: '#333',
+    color: '#fff',
+  },
+}
 
+export const errorHandler = ((error: Error, _: any, context: any) => {
+    let errorMsg = '';
+
+    if (context) {
+      if (context?.skipErrorHandling) {
+        return;
+      }
+
+      if (context?.errorMsg) {
+        errorMsg = context.errorMsg;  
+      }
+    }
   
     if(error instanceof AxiosError) {
       if (error.response) {

@@ -8,11 +8,11 @@ function Value({ value }: {
     return <div className='flex items-center gap-x-1'>
         {value.split(/\s/).map((val, i) => {
             if (i === 0) {
-                return <div className='text-md font-semibold'>
+                return <div key={i} className='text-md font-semibold'>
                     {val}
                 </div>
             } else {
-                return <div className={`text-sm text-dark-label-1  `}>
+                return <div key={i} className={`text-sm text-dark-label-1  `}>
                     {val}
                 </div>
             }

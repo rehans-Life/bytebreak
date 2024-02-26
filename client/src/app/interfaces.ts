@@ -113,10 +113,13 @@ export interface TagWithConfig extends LanguageTag {
   defaultConfiguration: string  
 }
 
-export interface Testcase {
-  _id: string
+export interface SampleTestcase {
   input: string
   output: string
+}
+
+export interface Testcase extends SampleTestcase {
+  _id: string
 }
 
 export type ApiErrorResponse = z.infer<typeof ApiErrorSchema>

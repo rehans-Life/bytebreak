@@ -12,6 +12,7 @@ import CodeError from '@/app/components/code-error';
 import CodePreview from '@/app/components/code-preview';
 import Testcase from '@/app/components/testcase';
 import CodeMetrics from '@/app/components/code-metrics';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function Page({
     params: { id }
@@ -22,7 +23,7 @@ export default function Page({
 
     const user = useAtomValue(userAtom);
 
-    const { data } = useQuery({
+    const { data, isLoading } = useQuery({
         queryKey: ['submissions', id],
         queryFn: getSubmission
     })
@@ -35,7 +36,31 @@ export default function Page({
         minute: "numeric"
     } as const)
 
-    return (<div>
+    if (isLoading) {
+        return <div className='px-4 py-10 min-w-96 sm:h-full h-80 overflow-y-auto'>
+            <Skeleton
+                className="h-6 w-44 bg-dark-fill-2 rounded-md"
+            />
+            <div className='p-1'></div>
+            <Skeleton
+                className="h-2 w-72 bg-dark-fill-2 rounded-md"
+            />
+            <div className='p-3'></div>
+            <Skeleton
+                className="h-28 w-full bg-dark-fill-2 rounded-md"
+            />
+            <div className='p-2'></div>
+            <Skeleton
+                className="h-72 w-full bg-dark-fill-2 rounded-md"
+            />
+            <div className='p-2'></div>
+            <Skeleton
+                className="h-32 w-full bg-dark-fill-2 rounded-md"
+            />
+        </div>
+    }
+
+    return (<div className='overflow-y-auto min-w-96 sm:h-full h-80'>
         <div
             onClick={() => {
                 router.back()
@@ -66,7 +91,7 @@ export default function Page({
             </div>
             {data?.status === 'Accepted' && <CodeMetrics runtime={data?.runtime || ""} memory={data?.memory || ""} />}
             {data?.status === 'Wrong Answer' && <Testcase testcaseInput={data.lastExecutedTestcase?.input || ""} />}
-            {data?.error && <CodeError errorMsg={data?.error || ""} />}
+            {(data?.error) && <CodeError errorMsg={data?.error || ""} />}
             <CodePreview language={data?.language} code={data?.code || ""} />
         </div>
     </div>

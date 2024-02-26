@@ -1,4 +1,4 @@
-import React, { ReactElement, useEffect, useMemo, useRef, useState } from 'react'
+import React, { ReactElement, useEffect, useMemo, useRef } from 'react'
 import { IoChevronDownOutline } from '@react-icons/all-files/io5/IoChevronDownOutline'
 import { atom, useAtom, useSetAtom } from 'jotai'
 import { IoCheckmark } from '@react-icons/all-files/io5/IoCheckmark'
@@ -40,12 +40,12 @@ function TableOption({ label, name, value }: { label: string, name: string, valu
 }
 
 function TableSelect({ label, name, options, showDropdown }: { label: string, name: string, options: HeaderOption[], showDropdown: boolean }) {
-    return <div className='flex items-center gap-x-1.5 cursor-pointer hover:text-white transition-all duration-150 ease-in'>
+    return <div className='flex items-center translate-x-0  gap-x-1.5 cursor-pointer hover:text-white transition-all duration-150 ease-in'>
         {label}
         <IoChevronDownOutline className={`${showDropdown ? 'rotate-180' : 'rotate-0'
             } ease-in duration-200`} />
         {showDropdown &&
-            <div className='absolute top-full my-2 overflow-y-auto max-h-52 w-52 rounded-md z-[9999] shadow-sm shadow-dark-layer-3 bg-dark-layer-3'>
+            <div className='fixed top-full my-2 overflow-y-auto max-h-52 w-52 rounded-md z-[99999999] shadow-sm shadow-dark-layer-3 bg-dark-layer-3'>
                 <TableOption label={label} value={null} name={name} />
                 {options.map(({ label, value }, i) => <TableOption key={i} label={label} value={value} name={name} />)}
             </div>
@@ -80,9 +80,16 @@ function TableHeader({ label, name, options, width }: Header) {
     </td>
 }
 
+interface Dimensions {
+    maxHeight?: string
+    maxWidth?: string
+    minHeight?: string
+    minWidth?: string
+}
+
 export default function Table<T, V = any, F = any>({
-    headers, rows, render, className, emptyMsg
-}: { emptyMsg?: string, className?: string, headers: Header<V, F>[], rows: T[], render: (row: T, index?: number) => ReactElement<HTMLTableRowElement> }) {
+    headers, rows, render, className, emptyMsg, dimensions
+}: { emptyMsg?: string, className?: string, dimensions?: Dimensions, headers: Header<V, F>[], rows: T[], render: (row: T, index?: number) => ReactElement<HTMLTableRowElement> }) {
     const headerRef = useRef<HTMLTableRowElement | null>(null);
 
     const [filters, setFilters] = useAtom(filtersAtom);
@@ -149,8 +156,18 @@ export default function Table<T, V = any, F = any>({
     }, [headers]);
 
     return (
-        <div className='w-full h-full overflow-y-auto'>
-            <table className={`${className}`}>
+        <div
+            style={{
+                maxHeight: dimensions?.maxHeight,
+                maxWidth: dimensions?.maxWidth
+            }}
+            className={`w-full h-full overflow-auto`}>
+            <table
+                style={{
+                    minHeight: dimensions?.minHeight,
+                    minWidth: dimensions?.minWidth
+                }}
+                className={`w-full h-full ${className}`} >
                 <thead>
                     <tr ref={headerRef} className='w-full border-b border-dark-border'>
                         {
@@ -164,7 +181,6 @@ export default function Table<T, V = any, F = any>({
                         <>
                             {filteredRows.map((row, index) => render(row, index))}
                             <tr className='!bg-transparent h-full'>
-                                <div></div>
                             </tr>
                         </>
                         :

@@ -10,7 +10,7 @@ import { ProblemType } from '../create-problem/interfaces'
 import { EditorView } from '@codemirror/view'
 import { Tag } from '../interfaces'
 import dynamic from 'next/dynamic'
-import MarkdownSkeleton from './markdown-skeleton'
+import MarkdownSkeleton from '../../skeletons/markdown-skeleton'
 import { CgSpinner } from "@react-icons/all-files/cg/CgSpinner";
 
 const MarkdownEditor = dynamic(

@@ -2,6 +2,7 @@ import { MutationFunction, QueryFunction } from "@tanstack/react-query";
 import { Problem } from "../app/create-problem/interfaces";
 import { ApiSuccessResponse, RunVarType, Comment, Submission, SubmissionDoc, TagWithConfig, SubmitVarType, Like, ProblemStatus } from "../app/interfaces";
 import axios from './axios'
+import { Judge0Submission } from "@/atoms/testcaseAtoms";
 
 export const getProblem : QueryFunction<Problem> = async function ({ queryKey: [, slug] }) {
   const { data } = await axios.get<ApiSuccessResponse<Problem>>(`api/v1/problems/${slug}`)
@@ -33,8 +34,8 @@ export const getDefaultConfigurations: QueryFunction<TagWithConfig[]> = async fu
   return data.data.languageConfigurations;
 }
 
-export const runCode: MutationFunction<Submission[], RunVarType> = async function(variables) {
-  const { data } =  await axios.post<ApiSuccessResponse<{ submissions: Submission[]}>>(`api/v1/submissions/run`, {
+export const runCode: MutationFunction<Judge0Submission[], RunVarType> = async function(variables) {
+  const { data } =  await axios.post<ApiSuccessResponse<{ submissions: Judge0Submission[]}>>(`api/v1/submissions/run`, {
     ...variables
   })
   

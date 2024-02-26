@@ -4,15 +4,18 @@ import Tag from "../models/Tag";
 import AppError from "../utils/appError";
 import { TestCases } from "./problemController";
 import axios from '../utils/axios'
+import z from 'zod';
+import { testcaseSchema } from "../models/TestCase";
 
 export interface Submission {
-    token: string,
-    stdout: string,
-    time: string,
-    memory: number,
-    stderr: string | null,
-    message: string | null,
-    compile_output: string,
+    token: string
+    stdout: string
+    time: string
+    memory: number
+    stderr: string | null
+    message: string | null
+    compile_output: string
+    testcase?: z.infer<typeof testcaseSchema>
     status: Status
 }
 
