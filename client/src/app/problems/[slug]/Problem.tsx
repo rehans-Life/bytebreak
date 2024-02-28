@@ -1,29 +1,21 @@
 'use client';
 
 import { useSuspenseQueries } from '@tanstack/react-query'
-import React, { ReactNode, useState } from 'react'
+import React, { ReactNode } from 'react'
 import CodeEditor from './components/code-editor';
 import { getDefaultConfigurations, getProblem } from '@/utils/api';
 import { Problem } from '@/app/create-problem/interfaces';
-import { useAtomValue, useSetAtom } from 'jotai';
+import { useSetAtom } from 'jotai';
 import { problemAtom } from '@/atoms/problemAtoms';
 import Header from './components/header';
 import { languagesAtom, selectLanguageAtom } from '@/atoms/languagesAtoms';
 import { TagWithConfig } from '../../interfaces';
-import { Section, SectionBody, SectionHeader, SectionFooter, SectionTab } from '@/app/components/section';
-import { IoDocumentTextOutline } from "@react-icons/all-files/io5/IoDocumentTextOutline";
-import { HiOutlineBookOpen } from "@react-icons/all-files/hi/HiOutlineBookOpen";
-import { IoDocumentsOutline } from "@react-icons/all-files/io5/IoDocumentsOutline";
-import { atomWithLocation } from 'jotai-location'
-import LeftFooter from './components/left-footer';
-import { useRouter } from 'next/navigation';
 import { FormProvider, useForm } from 'react-hook-form';
 import { TestCasesType } from './interfaces';
 import TestcasesSection from './components/testcases-section';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
 import ProblemInfo from './components/problem-info';
 
-const locationAtom = atomWithLocation()
 const handleStyle = "before:content-[''] before:absolute before:left-0 before:right-0 before:ml-auto before:mr-auto before:bg-dark-gray-6 before:rounded-md";
 
 export default function Problem({
@@ -33,10 +25,6 @@ export default function Problem({
     children: ReactNode,
     slug: string
 }) {
-    const router = useRouter();
-
-    const location = useAtomValue(locationAtom)
-    const [currTab, setCurrTab] = useState(location.pathname?.split("/")[location.pathname?.split("/").length - 1])
 
     const setProblem = useSetAtom(problemAtom);
     const setLanguagesConfigs = useSetAtom(languagesAtom)

@@ -1,4 +1,4 @@
-import { Section, SectionBody, SectionFooter, SectionHeader, SectionTab } from '@/app/components/section'
+import { Section, SectionBody, SectionHeader, SectionTab } from '@/app/components/section'
 import { useAtom, useAtomValue } from 'jotai'
 import React, { useEffect } from 'react'
 import { RiCheckboxLine } from '@react-icons/all-files/ri/RiCheckboxLine'

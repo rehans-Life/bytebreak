@@ -37,7 +37,7 @@ const MarkdownEditor = dynamic(
   }
 );
 
-const difficulties: Option<string>[] = [
+export const difficulties: Option<string>[] = [
   {
     value: 'easy',
     label: 'Easy',

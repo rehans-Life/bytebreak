@@ -131,7 +131,7 @@ export default function Page() {
                     return <tr onClick={() => {
                         router.push(`./submissions/${row._id}`);
                     }} key={index} className='cursor-pointer'>
-                        <td className="">
+                        <td>
                             <div className='flex flex-col items-start'>
                                 <span className={`text-sm font-medium ${row.status === 'Accepted' ? "text-dark-green-s" : "text-dark-red"}`}>
                                     {row.status}

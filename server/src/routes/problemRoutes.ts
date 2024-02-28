@@ -4,14 +4,16 @@ import {
   getProblem,
   getProblems,
   getDefaultConfigurations,
-  getEditorial
+  getEditorial,
+  parseTagsField
 } from '../controllers/problemController'
 import multer from 'multer'
 import AppError from '../utils/appError'
-import { protect } from '../controllers/authController'
+import { protect, setUser } from '../controllers/authController'
 import { setRef } from '../controllers/generalController'
 import likeRoutes from './likeRoutes'
 import submissionRoutes from './submissionRoutes';
+import ApiFeatures from '../utils/apiFeatures'
 
 const storage = multer.memoryStorage()
 const upload = multer({
@@ -29,7 +31,7 @@ const router = Router()
 
 router
 .route('/')
-.get(getProblems)
+.get(setUser, ApiFeatures.formatQuery, parseTagsField, getProblems)
 .post(protect, upload.single('testcases'), createProblem)
 
 router.route('/:identifier').get(getProblem);

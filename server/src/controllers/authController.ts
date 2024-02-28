@@ -1,4 +1,4 @@
-import { CookieOptions, RequestHandler, Response } from 'express'
+import { CookieOptions, Request, RequestHandler, Response } from 'express'
 import User, { IUser, IUserMethods } from '../models/User'
 import jwt from 'jsonwebtoken'
 import keys from '../../config/keys'
@@ -49,6 +49,27 @@ export const restrictTo =
     next(new AppError('Unauthorized User', 401))
   }
 
+const extractToken: (req: Request) => string | undefined = (req: Request) => req.cookies.jwt || req.headers['authorization']?.toString().split(' ')[1];
+
+export const setUser: RequestHandler = catchAsync(async (req, _, next) => {
+  const token = extractToken(req);
+
+  if (!token) return;
+
+  try {
+    var { id } = verifyToken(token) as { id: string }
+  } catch (err){
+     return;
+  }
+
+  const user = await User.findById(id)
+  if (!user) return;
+
+  req.user = user;
+
+  next();
+}) 
+
 export const protect: RequestHandler = catchAsync(async (req, _, next) => {
   if (
     (!req.headers['authorization'] ||
@@ -58,8 +79,7 @@ export const protect: RequestHandler = catchAsync(async (req, _, next) => {
     throw new AppError("Authorization Token doesn't exist", 404)
   }
 
-  const token =
-    req.cookies.jwt || req.headers['authorization']!.toString().split(' ')[1]
+  const token = extractToken(req)!;
 
   if (token === 'LOGGED OUT') {
     throw new AppError(

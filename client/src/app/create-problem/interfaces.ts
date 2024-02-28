@@ -24,6 +24,16 @@ export type ProblemType = {
   }
 }
 
+export interface SubProblem {
+  _id: string,
+  name: string
+  slug: string
+  accepted: number
+  submissions: number
+  status: 'todo' | 'solved' | 'attempted'
+  difficulty: 'hard' | 'medium' | 'easy'
+}
+
 export interface Problem {
   _id: string,
   name: string

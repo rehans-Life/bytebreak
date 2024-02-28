@@ -2,6 +2,7 @@ import fs from 'fs'
 import mongoose from 'mongoose'
 import Tag from '../src/models/Tag'
 import dotenv from 'dotenv'
+import Problem from '../src/models/Problem'
 
 dotenv.config({
   path: '.env',
@@ -26,13 +27,38 @@ let tags = (
       ) || '',
     )
 
-    if (process.argv[2] === '--import') {
-      await importData()
-    }
+    const problems = await Problem.aggregate()
+    .lookup({
+      localField: "_id",
+      foreignField: "problem",
+      from: 'submissions',
+      as: 'status',
+      pipeline: [
+        {
+          $match: {
+            user: new mongoose.Types.ObjectId("65c0d2d653bad783b5dc41bc")
+          }
+        },
+      ]
+      })
+      .match({
+        tags: {
+          $all: ['103']
+        }
+      })
+    .project("name slug difficulty accepted submissions status" as unknown as { [key: string]: any })
+    .skip(1 * 4)
+    
 
-    if (process.argv[2] === '--delete') {
-      await deleteData()
-    }
+    console.log(problems)
+
+    // if (process.argv[2] === '--import') {
+    //   await importData()
+    // }
+
+    // if (process.argv[2] === '--delete') {
+    //   await deleteData()
+    // }
   } catch (err) {
     console.log(err)
   }

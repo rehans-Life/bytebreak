@@ -1,3 +1,4 @@
+import { NextFunction, Request, RequestHandler } from 'express'
 import { Query } from 'mongoose'
 
 type QueryField = 'page' | 'limit' | 'sort' | 'fields'
@@ -9,11 +10,41 @@ interface QueryObj {
   fields?: string
 }
 
+export interface PaginateProbelmQuery {
+  page: string,
+  limit: string,
+  fields: string,
+  filter: { [key: string]: any }
+}
+
 class ApiFeatures {
   constructor(
     public query: Query<any, any>,
     public queryObj: QueryObj,
   ) {}
+
+  static formatQuery: RequestHandler  = (req: Request, _, next: NextFunction) => {
+    let { page, limit, fields } = req.query;
+    const excludedFields = ["page", "limit", "fields"];
+  
+    if(!page) page = "1";
+    if(!limit) limit = "10";
+    if(fields) fields = fields.toString().replace(/\,/g, ' ');
+    else fields = "-__v";
+  
+    let filter = { ...req.query };
+    excludedFields.forEach((field) => delete filter[field]);
+    filter = JSON.parse(JSON.stringify(filter).replace(/\b(lt|gt|lte|gte|eq|ne|all|in|regex)\b/g, (match) => `$${match}`));
+    
+    req.query = {
+      page,
+      limit,
+      fields,
+      filter
+    }
+
+    next();
+  }
 
   filter() {
     const excludedFields = ['page', 'limit', 'sort', 'fields']
@@ -23,8 +54,8 @@ class ApiFeatures {
 
     filterObj = JSON.parse(
       JSON.stringify(filterObj).replace(
-        /gte|gt|lt|lte|eq|in/g,
-        (match) => `${match}`,
+        /\b(gte|gt|lt|lte|eq|in)\b/g,
+        (match) => `$${match}`,
       ),
     )
 

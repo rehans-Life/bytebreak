@@ -1,6 +1,6 @@
 import { MutationFunction, QueryFunction } from "@tanstack/react-query";
-import { Problem } from "../app/create-problem/interfaces";
-import { ApiSuccessResponse, RunVarType, Comment, Submission, SubmissionDoc, TagWithConfig, SubmitVarType, Like, ProblemStatus } from "../app/interfaces";
+import { Problem, SubProblem } from "../app/create-problem/interfaces";
+import { ApiSuccessResponse, RunVarType, Comment, SubmissionDoc, TagWithConfig, SubmitVarType, Like, ProblemStatus, Tag } from "../app/interfaces";
 import axios from './axios'
 import { Judge0Submission } from "@/atoms/testcaseAtoms";
 
@@ -69,4 +69,32 @@ export const likeDoc: MutationFunction<boolean, { id: string, resource: string }
 export const unlikeDoc: MutationFunction<boolean, { id: string, resource: string }> = async function({id, resource}) {
   await axios.delete<ApiSuccessResponse<Like>>(`api/v1/${resource}/${id}/like`)
   return true;
+}
+
+export const getTags: QueryFunction<Tag[]> = async ({ queryKey: [, category] }) => {
+  const { data: res } = await axios.get<ApiSuccessResponse<Tag[]>>(
+    `/api/v1/general/tags?category=${category}`
+  )
+  return res.data
+} 
+
+export const getProblems: QueryFunction<SubProblem[]> = async function({
+  queryKey, signal
+}) {
+  const [_ , page, limit, difficulty, status, name, tags] = queryKey as [string, string, string, string | null, string | null, string | null,string[],];
+
+  const params = new URLSearchParams();
+
+  params.set("page", page);
+  params.set("limit", limit);
+  tags.forEach((tag, index) => params.set(`tags[all][${index}]`, tag))
+
+  if (status) params.set("status", status);
+  if (difficulty) params.set("difficulty", difficulty);
+  if (name) params.set("name", name)
+
+  const { data } = await axios.get<ApiSuccessResponse<SubProblem[]>>(`api/v1/problems?${params.toString()}`, {
+    signal
+  });
+  return data.data;
 }

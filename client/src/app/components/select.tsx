@@ -39,13 +39,13 @@ interface SingleProps<VT> {
   isMulti: false
 }
 
-interface NonNullSingle<VT> extends SingleProps<VT> {
+interface NullableSingle<VT> extends SingleProps<VT> {
   undefined: true
   value?: Option<VT>
   onChange?: (option?: Option<VT>) => void
 }
 
-interface NullableSingle<VT> extends SingleProps<VT> {
+interface NonNullSingle<VT> extends SingleProps<VT> {
   undefined: false
   value: Option<VT>
   onChange?: (option: Option<VT>) => void

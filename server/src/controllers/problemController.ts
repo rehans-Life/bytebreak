@@ -4,12 +4,12 @@ import AppError from '../utils/appError'
 import z from 'zod'
 import Problem from '../models/Problem'
 import TestCase, { testcaseSchema } from '../models/TestCase'
-import { getAll } from './handlerFactory'
 import Tag, { ITag } from '../models/Tag'
 import { isValidObjectId } from 'mongoose'
 import { getDefaultCodeConfiguration as generateCode } from 'lang-code-configuration'
 import { batchSubmission } from './judge0Controller'
 import Comment from '../models/Comment'
+import { PaginateProbelmQuery } from '../utils/apiFeatures'
 
 type Params = {identifier: string}
 
@@ -49,7 +49,129 @@ function createQuery(params: Params) {
   return query;
 }
 
-export const getProblems = getAll(Problem)
+interface Itr<O, K> {
+  obj: O, 
+  key: K
+}
+
+export const parseTagsField: RequestHandler = catchAsync(async (req, _, next) => {  
+  let { filter } = req.query as unknown as PaginateProbelmQuery;
+
+  function recurse(obj: {[key: string]: any} | Array<any>) {
+    if (obj instanceof Array) {
+      obj.forEach((_, key) => helper({ obj, key }));
+      return;
+    } 
+    
+    Object.keys(obj).forEach((key) => helper({ obj, key }))
+  }
+
+  function helper({ obj, key }: Itr<{ [key: string]: any }, string> | Itr<Array<any>, number>) {
+    if (obj instanceof Array) {
+
+      if (typeof obj[key as number] === 'string') {
+        obj[key as number] = Number(obj[key as number])
+        return;
+      }
+
+      recurse(obj[key as number]);
+      return;
+    }
+
+    if(typeof obj[key as string] === 'string') {
+      obj[key as string] = Number(obj[key as string])
+      return;
+    }
+
+    recurse(obj[key as string]);
+    return;
+  }
+
+  if (!filter.tags) return next();
+
+  if (typeof filter.tags === 'string') {
+    filter.tags = Number(filter.tags);
+    return next();
+  }
+
+  if (filter.tags instanceof Array) {
+    filter.tags = filter.tags.map((tag) => Number(tag));
+    return next();
+  }
+
+  Object.keys(filter.tags).forEach((key) => helper({obj: filter.tags, key}));
+  next();
+})
+
+export const getProblems: RequestHandler = catchAsync(async (req, res) => {
+  let { page, limit, fields, filter } = req.query as unknown as PaginateProbelmQuery;
+  
+  const problems = await Problem.aggregate()
+  .lookup({
+    localField: "_id",
+    foreignField: "problem",
+    from: 'submissions',
+    as: 'status',
+    pipeline: [
+      {
+        $match: {
+          user: req.user._id
+        }
+      },
+      {
+        $group: {
+          _id: null,
+          statuses: { $push: "$status" }
+        }
+      },
+      {
+        $project: {
+          status: {
+            $reduce: {
+              input: "$statuses",
+              initialValue: "attempted",
+              in: {
+                $cond: {
+                  if: { $eq: ["$$this", "Accepted"] },
+                  then: "solved",
+                  else: "$$value"
+                }
+              }
+            }
+          }
+        }
+      }
+    ]
+  })
+  .unwind({
+    path: "$status",
+    preserveNullAndEmptyArrays: true,
+  })
+  .append({ $set: 
+    { 
+      status: { 
+        $cond: { 
+          if: { $or: 
+            [ 
+              { $eq: ["$status.status", "solved"] }, 
+              { $eq: ["$status.status", "attempted"] } 
+            ] }, 
+          then: '$status.status', 
+          else: 'todo',
+        } 
+    } 
+  } 
+  })
+  .match(filter as { [x: string]: any })
+  .skip((Number(page) - 1) * Number(limit))
+  .limit(Number(limit))
+  .project(fields as unknown as { [key: string]: any })
+
+  return res.status(200).json({
+    status: "success",
+    data: problems
+  });
+})
 
 export const createProblem: RequestHandler = catchAsync(
   async (req, res, next) => {
