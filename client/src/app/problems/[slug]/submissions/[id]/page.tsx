@@ -6,13 +6,14 @@ import { BiArrowBack } from '@react-icons/all-files/bi/BiArrowBack'
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation';
 import VertDivider from '../../../../components/vert-divider'
-import { useAtomValue } from 'jotai';
-import { userAtom } from '@/atoms/userAtom';
 import CodeError from '@/app/components/code-error';
 import CodePreview from '@/app/components/code-preview';
 import Testcase from '@/app/components/testcase';
 import CodeMetrics from '@/app/components/code-metrics';
 import { Skeleton } from '@/components/ui/skeleton';
+import defaultPhoto from '@/utils/defaultPhoto';
+import Image from 'next/image';
+import formatDate from '@/utils/formatDate';
 
 export default function Page({
     params: { id }
@@ -21,11 +22,15 @@ export default function Page({
 }) {
     const router = useRouter();
 
-    const user = useAtomValue(userAtom);
-
-    const { data, isLoading } = useQuery({
+    const { data, isLoading, isError } = useQuery({
+        meta: {
+            onError: () => {
+                router.back()
+            }
+        },
         queryKey: ['submissions', id],
-        queryFn: getSubmission
+        queryFn: getSubmission,
+        throwOnError: false
     })
 
     const [options] = useState({
@@ -36,7 +41,7 @@ export default function Page({
         minute: "numeric"
     } as const)
 
-    if (isLoading) {
+    if (isLoading || isError) {
         return <div className='px-4 py-10 min-w-96 sm:h-full h-80 overflow-y-auto'>
             <Skeleton
                 className="h-6 w-44 bg-dark-fill-2 rounded-md"
@@ -82,10 +87,10 @@ export default function Page({
                     }
                 </div>
                 <div className='flex gap-x-1 items-center'>
-                    <img src={`${user.photo}`} alt="user" className='w-4 h-4 rounded-full' />
-                    <div className='font-medium text-white text-xs'>{user.username}</div>
+                    <Image width={500} height={500} src={`${data?.user.photo || defaultPhoto}`} alt="user" className='w-4 h-4 rounded-full' />
+                    <div className='font-medium text-white text-xs'>{data?.user.username}</div>
                     <div className='text-dark-label-2 text-xs'>
-                        submitted at {new Intl.DateTimeFormat("en", options).format(new Date(data?.createdAt || "12-12-12"))}
+                        submitted at {data?.createdAt ? formatDate(data.createdAt || "2014-12-12", options) : ""}
                     </div>
                 </div>
             </div>

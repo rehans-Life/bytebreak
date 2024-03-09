@@ -1,5 +1,7 @@
+import { IUser } from '@/atoms/userAtom'
 import { langs } from 'lang-code-configuration/data'
 import z from 'zod'
+import { Problem } from './create-problem/interfaces'
 
 const ApiErrorSchema = z.object({
   status: z.enum(['error', 'fail']),
@@ -64,8 +66,8 @@ export interface Submission {
 
 export interface SubmissionDoc {
   _id: string,
-  problem: string
-  user: string
+  problem?: Problem,
+  user: IUser
   language: Tag
   code: string
   runtime: string
@@ -128,3 +130,4 @@ export interface ApiSuccessResponse<ST> {
   status: 'success'
   data: ST
 }
+

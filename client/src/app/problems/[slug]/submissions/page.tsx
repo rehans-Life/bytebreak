@@ -13,6 +13,7 @@ import { AiOutlineClockCircle } from "@react-icons/all-files/ai/AiOutlineClockCi
 import { FiCpu } from "@react-icons/all-files/fi/FiCpu";
 import { useRouter } from 'next/navigation'
 import { Skeleton } from '@/components/ui/skeleton'
+import Link from 'next/link'
 
 const headersAtom = atom([
     {
@@ -46,6 +47,16 @@ export default function Page() {
     const router = useRouter();
 
     const user = useAtomValue(userAtom)
+
+    if (!user) {
+        return <div className='flex flex-col items-center justify-center gap-y-4 w-full overflow-x-auto min-w-96 sm:h-full h-80'>
+            <div className='text-dark-label-2 text-sm'>View your Submission records here</div>
+            <Link href="/login" className='px-3 py-2 text-sm rounded-lg text-white font-medium bg-dark-green-s hover:bg-dark-green-hover'>
+                Register or Sign in
+            </Link>
+        </div>
+    }
+
     const problem = useAtomValue(problemAtom);
     const languageConfigs = useAtomValue(languagesAtom)
 

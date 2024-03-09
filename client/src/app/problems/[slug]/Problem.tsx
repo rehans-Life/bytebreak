@@ -15,6 +15,7 @@ import { TestCasesType } from './interfaces';
 import TestcasesSection from './components/testcases-section';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
 import ProblemInfo from './components/problem-info';
+import { codesAtom } from '@/app/create-problem/components/editor';
 
 const handleStyle = "before:content-[''] before:absolute before:left-0 before:right-0 before:ml-auto before:mr-auto before:bg-dark-gray-6 before:rounded-md";
 
@@ -27,6 +28,7 @@ export default function Problem({
 }) {
 
     const setProblem = useSetAtom(problemAtom);
+    const setCodes = useSetAtom(codesAtom);
     const setLanguagesConfigs = useSetAtom(languagesAtom)
     const setLang = useSetAtom(selectLanguageAtom)
 
@@ -40,13 +42,14 @@ export default function Problem({
                 },
                 queryKey: ['problems', slug],
                 queryFn: getProblem,
+
             },
             {
                 meta: {
                     onSuccess: (data: TagWithConfig[]) => {
                         const firstLang = data[0];
                         setLanguagesConfigs(data)
-                        setLang(firstLang)
+                        setLang(firstLang, true)
                     }
                 },
                 queryKey: ['defaultConfiguration', slug],

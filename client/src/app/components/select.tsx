@@ -4,6 +4,7 @@ import { IoChevronDownOutline } from '@react-icons/all-files/io5/IoChevronDownOu
 import { IoClose } from '@react-icons/all-files/io5/IoClose'
 import { IoCheckmark } from '@react-icons/all-files/io5/IoCheckmark'
 import { IoSearch } from '@react-icons/all-files/io5/IoSearch'
+import { atom, useAtom, useSetAtom } from 'jotai'
 
 export interface Option<T> {
   value: T
@@ -16,6 +17,7 @@ interface Props<VT> {
   name?: string
   placeholder?: string
   enableSearch: boolean
+  optionStyle?: string,
   onFocus?: () => void
   onBlur?: () => void
   menuHeight?: string
@@ -26,6 +28,7 @@ interface Props<VT> {
   options: Option<VT>[]
   highlightedOptions?: Option<VT>[]
   highlightTag?: string
+  disabled?: boolean
 }4
 
 interface MultiProps<VT> {
@@ -51,15 +54,19 @@ interface NonNullSingle<VT> extends SingleProps<VT> {
   onChange?: (option: Option<VT>) => void
 }
 
+const queryAtom = atom("");
+
 const Option = function <VT>({
   option,
   props,
   isHighlighted,
+  optionStyle,
   highlightedTag = 'Related',
   setShowMenu,
 }: {
   option: Option<VT>
   props: NullableSingle<VT> | NonNullSingle<VT> | MultiProps<VT>
+  optionStyle?: string,
   isHighlighted?: boolean
   highlightedTag?: string
   setShowMenu: React.Dispatch<React.SetStateAction<boolean>>
@@ -70,12 +77,14 @@ const Option = function <VT>({
       : props.value.value === option.value
     : false
 
+  const setQuery = useSetAtom(queryAtom);
+
   return (
     <div
       style={{
         color: option.color,
       }}
-      className={`text-dark-gray-8 py-2 ${selected
+      className={`${optionStyle} text-dark-gray-8 py-2 ${selected
         ? `font-medium text-dark-label-1`
         : `font-normal text-dark-label-2`
         }  text-sm rounded-md px-3 hover:bg-dark-button cursor-pointer flex items-center justify-between gap-x-3`}
@@ -99,6 +108,8 @@ const Option = function <VT>({
           setShowMenu((prev) => !prev)
           props.onChange?.(option)
         }
+
+        setQuery("")
       }}
     >
       <div className="flex items-center gap-x-2.5">
@@ -136,15 +147,17 @@ export default function Select<VT = unknown>({
   replaceName,
   btnStyle,
   undefined,
+  optionStyle,
   inlineBtnStyle,
   onChange,
   onBlur,
   onFocus,
   highlightTag,
   highlightedOptions,
+  disabled = false,
 }: (NullableSingle<VT> | NonNullSingle<VT> | MultiProps<VT>) & Props<VT>) {
   const [showMenu, setShowMenu] = useState(false)
-  const [query, setQuery] = useState('')
+  const [query, setQuery] = useAtom(queryAtom)
 
   const containerRef = useRef<HTMLDivElement | null>(null)
   const bottomMenuRef = useRef<HTMLDivElement | null>(null)
@@ -175,11 +188,12 @@ export default function Select<VT = unknown>({
           onFocus?.()
         }}
       >
-        {children ?? (
+        {children || (
           <button
             type="button"
             style={btnStyle}
-            className={`${inlineBtnStyle} bg-dark-fill-2 hover:bg-dark-hover text-[15px] text-white px-3 py-1 rounded-md flex items-center justify-between gap-x-1`}
+            disabled={disabled}
+            className={`${inlineBtnStyle} bg-dark-fill-2 hover:bg-dark-hover text-[15px] text-white disabled:!text-dark-gray-6 px-3 py-1 rounded-md flex items-center justify-between gap-x-1`}
           >
             <div className="capitalize">
               {replaceName && value ? (
@@ -271,6 +285,7 @@ export default function Select<VT = unknown>({
                       key={i}
                       option={option}
                       highlightedTag={highlightTag}
+                      optionStyle={optionStyle}
                       isHighlighted={highlightedOptions?.some(
                         (tag) => tag.value === option.value
                       )}

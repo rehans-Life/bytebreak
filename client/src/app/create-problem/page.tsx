@@ -26,6 +26,8 @@ import '@uiw/react-markdown-editor/markdown-editor.css';
 import '@uiw/react-markdown-preview/markdown.css';
 import dynamic from 'next/dynamic'
 import MarkdownSkeleton from '../../skeletons/markdown-skeleton'
+import { codesAtom } from './components/editor'
+import Header from '../components/header'
 
 const MarkdownEditor = dynamic(
   () => import("@uiw/react-markdown-editor").then((mod) => mod.default),
@@ -63,6 +65,7 @@ const editroialDefaultMarkup =
 
 export default function Create() {
   const setTags = useSetAtom(tagsAtom)
+  const setCodes = useSetAtom(codesAtom)
   const topics = useAtomValue(topicsAtom)
 
   const router = useRouter()
@@ -106,6 +109,7 @@ export default function Create() {
       queryClient.setQueryData(['problems', data.problem.slug], data.problem)
       queryClient.setQueryData(['editorial', data.problem.slug], data.editorial)
       router.push(`/problems/${data.problem.slug}`)
+      setCodes({})
       reset();
     },
     throwOnError: false,

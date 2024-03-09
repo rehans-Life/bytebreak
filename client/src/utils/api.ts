@@ -1,8 +1,58 @@
 import { MutationFunction, QueryFunction } from "@tanstack/react-query";
 import { Problem, SubProblem } from "../app/create-problem/interfaces";
-import { ApiSuccessResponse, RunVarType, Comment, SubmissionDoc, TagWithConfig, SubmitVarType, Like, ProblemStatus, Tag } from "../app/interfaces";
+import { ApiSuccessResponse, RunVarType, Comment, SubmissionDoc, TagWithConfig, SubmitVarType, Like, ProblemStatus, Tag, Submission } from "../app/interfaces";
 import axios from './axios'
 import { Judge0Submission } from "@/atoms/testcaseAtoms";
+import { IUser, UserInfo } from "@/atoms/userAtom";
+import { SignUpFormType } from "@/app/signup/page";
+import { LoginFormType } from "@/app/login/page";
+import createFormData from "./createFormData";
+import { SignInFormType } from "@/app/social/signup/page";
+import { ProblemsCount, UserCalender } from "@/app/[username]/interfaces";
+
+export const getMe = async () => {
+  try {
+    const { data } = await axios.get<ApiSuccessResponse<IUser>>('api/v1/users/me');
+    return data.data;
+  } catch (err) {
+    return false;
+  }
+} 
+
+export const uploadFile: MutationFunction<string, File> = async (file) => {
+  const { data } = await axios.post<ApiSuccessResponse<{ url: string }>>(`api/v1/users/upload`, createFormData({
+    avatar: file 
+  }), {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  });
+  return data.data.url; 
+}
+
+export const signup: MutationFunction<IUser, SignUpFormType> = async (user: SignUpFormType) => {
+  const { data } = await axios.post<ApiSuccessResponse<{user: IUser}>>(`api/v1/users/signup`, user);
+  return data.data.user;
+}
+
+export const login: MutationFunction<IUser, LoginFormType> = async (user: LoginFormType) => {
+  const { data } = await axios.post<ApiSuccessResponse<{user: IUser}>>(`api/v1/users/login`, user);
+  return data.data.user;
+}
+
+export const getGoogleUser: MutationFunction<IUser, string> = async (userId: string) => {
+  const { data } = await axios.get<ApiSuccessResponse<{ user: IUser}>>(`api/v1/users/google/${userId}`);
+  return data.data.user;
+}
+
+export const createGoogleUser: MutationFunction<IUser, SignInFormType> = async (user) => {
+  const { data } = await axios.post<ApiSuccessResponse<IUser>>(`api/v1/users/google`, user);
+  return data.data;
+}
+
+export const logout: MutationFunction<undefined, undefined> = async () => {
+  await axios.post<ApiSuccessResponse<undefined>>(`api/v1/users/logout`);
+}
 
 export const getProblem : QueryFunction<Problem> = async function ({ queryKey: [, slug] }) {
   const { data } = await axios.get<ApiSuccessResponse<Problem>>(`api/v1/problems/${slug}`)
@@ -10,8 +60,8 @@ export const getProblem : QueryFunction<Problem> = async function ({ queryKey: [
 }
 
 export const getSubmissions : QueryFunction<SubmissionDoc[]> = async function ({ queryKey: [, problemId, userId] }) {
-  const { data } = await axios.get<ApiSuccessResponse<SubmissionDoc[]>>(`api/v1/submissions?problem=${problemId}&user=${userId}&fields=_id,status,createdAt,language,runtime,memory`)
-  return data.data;
+  const { data } = await axios.get<ApiSuccessResponse<{ submissions: SubmissionDoc[]}>>(`api/v1/submissions?problem=${problemId}&user=${userId}&fields=_id,status,createdAt,language,runtime,memory`)
+  return data.data.submissions;
 }
 
 export const getSubmission : QueryFunction<SubmissionDoc> = async function ({ queryKey: [, submissionId] }) {
@@ -78,7 +128,32 @@ export const getTags: QueryFunction<Tag[]> = async ({ queryKey: [, category] }) 
   return res.data
 } 
 
-export const getProblems: QueryFunction<SubProblem[]> = async function({
+export const getUserCalender: QueryFunction<UserCalender> = async ({ queryKey: [, username, year]  }) => {
+  const { data } = await axios.get<ApiSuccessResponse<UserCalender>>(`api/v1/users/user-calender/${username}?year=${year}`);
+  return data.data;
+}
+
+export const getProblemsCount: QueryFunction<ProblemsCount> = async ({}) => {
+  const { data } = await axios.get<ApiSuccessResponse<{ problemsCount: ProblemsCount }>>(`api/v1/general/all-questions-count`);
+  return data.data.problemsCount;
+}
+
+export const getUserInfo: QueryFunction<UserInfo> = async ({ queryKey: [, username] }) => {
+  const { data } = await axios.get<ApiSuccessResponse<{ userInfo: UserInfo }>>(`api/v1/users/user-info/${username}`);
+  return data.data.userInfo;
+}
+ 
+export const getSubmissionsCount: QueryFunction<ProblemsCount> = async ({ queryKey: [, username ] }) => {
+  const { data } = await axios.get<ApiSuccessResponse<{ submissionCount: ProblemsCount }>>(`api/v1/users/user-submissions-count/${username}`);
+  return data.data.submissionCount;
+}
+
+export const getContributions: QueryFunction<{ maxPage: number, problems?: Problem[], submissions?: SubmissionDoc[] }> = async ({ queryKey: [resource, page, user] }) => {
+  const { data } = await axios.get<ApiSuccessResponse<{ maxPage: number, problems?: Problem[], submissions?: SubmissionDoc[] }>>(`api/v1/${resource}?page=${page}&limit=5&user=${user}`);
+  return data.data;
+}
+
+export const getProblems: QueryFunction<{ problems: SubProblem[], maxPage: number }> = async function({
   queryKey, signal
 }) {
   const [_ , page, limit, difficulty, status, name, tags] = queryKey as [string, string, string, string | null, string | null, string | null,string[],];
@@ -91,9 +166,11 @@ export const getProblems: QueryFunction<SubProblem[]> = async function({
 
   if (status) params.set("status", status);
   if (difficulty) params.set("difficulty", difficulty);
-  if (name) params.set("name", name)
+  if (name) params.set("name[regex]", `(?i)${name}`)
 
-  const { data } = await axios.get<ApiSuccessResponse<SubProblem[]>>(`api/v1/problems?${params.toString()}`, {
+  params.set('fields', "_id,slug,name,accepted,submissions,difficulty,tags,status,likes")
+
+  const { data } = await axios.get<ApiSuccessResponse<{ problems: SubProblem[], maxPage: number }>>(`api/v1/problems?${params.toString()}`, {
     signal
   });
   return data.data;

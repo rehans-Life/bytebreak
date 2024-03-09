@@ -2,7 +2,7 @@ import { Like } from '@/app/interfaces';
 import { hasLikedAtom, problemAtom } from '@/atoms/problemAtoms';
 import { getLike, likeDoc, unlikeDoc } from '@/utils/api';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { useAtom } from 'jotai';
+import { useAtom, useAtomValue } from 'jotai';
 import React from 'react'
 import { AiOutlineLike } from "@react-icons/all-files/ai/AiOutlineLike";
 import { AiFillLike } from "@react-icons/all-files/ai/AiFillLike";
@@ -13,11 +13,14 @@ import { FaRegQuestionCircle } from "@react-icons/all-files/fa/FaRegQuestionCirc
 import FormatNumber from '@/app/components/formatNumber';
 import Tooltip from "../../../components/tooltip";
 import VertDivider from "../../../components/vert-divider";
+import { userAtom } from '@/atoms/userAtom';
+import { showSignInToast } from '@/toasts/signInReminder';
 
 export default function LeftFooter({
     problemId
 }: { problemId: string }) {
 
+    const user = useAtomValue(userAtom);
     const [problem, setProblem] = useAtom(problemAtom);
     const [hasLiked, setHasLiked] = useAtom(hasLikedAtom);
 
@@ -76,6 +79,11 @@ export default function LeftFooter({
             <div className='flex items-center gap-x-3'>
                 <button
                     disabled={like.isPending || unLike.isPending || isLiked.isFetching} onClick={() => {
+                        if (!user) {
+                            showSignInToast('Sign in to like or dislike this problem')
+                            return;
+                        }
+
                         if (hasLiked) {
                             unLike.mutate({ id: problem?._id || "", resource: "problems" })
                             return;

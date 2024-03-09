@@ -24,33 +24,31 @@ export type ProblemType = {
   }
 }
 
-export interface SubProblem {
+export interface ProblemInfo {
   _id: string,
   name: string
   slug: string
   accepted: number
   submissions: number
-  status: 'todo' | 'solved' | 'attempted'
   difficulty: 'hard' | 'medium' | 'easy'
+  likes: number
 }
 
-export interface Problem {
-  _id: string,
-  name: string
-  slug: string
+export interface SubProblem extends ProblemInfo {
+  status: 'todo' | 'solved' | 'attempted'
+}
+
+export interface Problem extends ProblemInfo {
   tags: Tag[]
   description: string
-  difficulty: 'hard' | 'medium' | 'easy'
   config: {
     funcName: string
     returnType: ParamType<string>
     params: ParamType<string>[]
   }
-  submissions: number
-  accepted: number
   acceptanceRate: number
-  likes: number,
   sampleTestCases: Testcase[]
+  createdAt: string
 }
 
 export const types: Option<string>[] = Object.keys(getTypes('python')).map(

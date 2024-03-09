@@ -36,5 +36,8 @@ export const errorHandler = ((error: Error, _: any, context: any) => {
         console.log(error.message)
         toast.error(error.message, toastOptions)
       }
+    } else {
+      console.log(error.message)
+      toast.error(error.message, toastOptions)
     }
   })

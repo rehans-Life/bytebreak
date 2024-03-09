@@ -27,6 +27,9 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog"
 import Select, { Option } from '@/app/components/select';
+import Image from 'next/image';
+import Link from 'next/link';
+import { showSignInToast } from '@/toasts/signInReminder';
 
 export const fontSizes: Option<number>[] = Array(10).fill(0).map((_, i) => {
     const size = 12 + i;
@@ -88,7 +91,6 @@ export default function Header() {
     })
 
     useEffect(() => {
-        console.log(run.isPending)
         setExecxutingState(run.isPending);
     }, [run.isPending]);
 
@@ -140,14 +142,22 @@ export default function Header() {
 
     return (
         <div className='flex items-center flex-col xs:flex-row justify-between px-4 gap-y-3'>
-            <img src="/logo.png" className='h-5 w-5 object-contain' alt="logo" />
+            <Link href="/">
+                <Image width={1080} height={1080} src="/logo.png" className='h-5 w-5 object-contain' alt="logo" />
+            </Link>
             <div className='flex items-center relative overflow-hidden gap-x-[2px]'>
 
                 <div className={`absolute ml-auto mr-auto left-0 right-0 h-full rounded-md ${submit.isPending || run.isPending ? 'w-full' : 'w-0'} overflow-hidden bg-gray-8 flex items-center justify-center gap-x-1.5 text-dark-gray-6 text-sm transition-all ease-out duration-100`}>
                     <CgSpinner className='text-lg animate-spin dark-gray-6' />
                     Pending...
                 </div>
-                <Tooltip message={'Run'} onClick={() => { onRun() }}>
+                <Tooltip
+                    message={'Run'}
+                    onClick={() => {
+                        onRun()
+                    }}
+                    side='left'
+                >
                     <div className={`flex items-center gap-x-3 hover:bg-dark-divider-border-2 bg-gray-8 px-2.5 py-1.5 font-medium rounded-bl-md rounded-tl-md ease-out duration-100 transition-all`}>
                         <div className='text-dark-gray-8'>
                             <FaPlay />
@@ -155,7 +165,17 @@ export default function Header() {
                         Run
                     </div>
                 </Tooltip>
-                <Tooltip message={'Submit'} onClick={() => { onSubmit() }}>
+                <Tooltip
+                    message={'Submit'}
+                    side='right'
+                    onClick={() => {
+                        if (!user) {
+                            showSignInToast('Sign in to submit this problem')
+                            return;
+                        }
+                        onSubmit()
+                    }}
+                >
                     <div className={`flex items-center gap-x-2 rounded-br-md rounded-tr-md px-3 py-1.5 font-medium text-dark-green-hover bg-gray-8 hover:bg-dark-divider-border-2 ease-out duration-100 transition-all`}>
                         <IoCloudUpload />
                         Submit
@@ -165,9 +185,9 @@ export default function Header() {
             <div className='flex items-center gap-x-4'>
                 <Dialog>
                     <DialogTrigger asChild>
-                        <Tooltip message={'Settings'} onClick={function (event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void {
+                        <Tooltip side='left' message={'Settings'} onClick={function (event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void {
                         }}>
-                            <div >
+                            <div>
                                 <FiSettings className="text-dark-label-2" />
                             </div>
                         </Tooltip>
@@ -189,7 +209,21 @@ export default function Header() {
                     </DialogContent>
                 </Dialog>
                 <div>
-                    <img className='h-5 w-5 rounded-full cursor-pointer' src={user.photo || "/default.png"} alt="Profile Photo" />
+                    {user
+                        ? <Link href={`/${user.username}`}>
+                            <Image width={500} height={500} className='h-5 w-5 rounded-full cursor-pointer' src={user.photo || "/default.png"} alt="Profile Photo" />
+                        </Link>
+                        : <div className="text-dark-label-2 text-sm flex items-center gap-x-1">
+                            <Link href={'/signup'} className='rounded-md py-2 px-3 text-dark-label-2 hover:text-white'>
+                                Register
+                            </Link>
+                            or
+                            <Link href={'/login'} className='rounded-md py-2 px-3 text-dark-label-2 hover:text-white'>
+                                Login
+                            </Link>
+
+                        </div>
+                    }
                 </div>
             </div>
         </div>

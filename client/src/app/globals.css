@@ -202,3 +202,27 @@ a {
 .section-tab:not(:last-child):hover::before {
   display: none;
 }
+
+#cal-heatmap-index .ch-domain-text {
+  color: rgb(179, 179, 179) !important;
+  font-size: 13px;
+  margin-top: 5px !important;
+}
+
+#cal-heatmap-index .ch-subdomain-bg {
+  fill: rgb(60, 60, 60);
+}
+
+#cal-heatmap-index {
+  overflow-x: auto;
+  overflow-y: hidden;
+  width: 100%;
+}
+
+.heat-map-skeleton {
+  display: none;
+}
+
+#cal-heatmap-index:empty + .heat-map-skeleton {
+  display: flex
+}

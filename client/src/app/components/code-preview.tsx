@@ -1,7 +1,6 @@
 import React from 'react'
 import { Tag } from '../interfaces'
 import VertDivider from "./vert-divider";
-import Highlight from 'react-highlight'
 import 'highlight.js/styles/vs2015.css'
 import useShowMore from '@/hooks/useShowMore';
 import { ChevronsDown, ChevronsUp } from 'lucide-react';

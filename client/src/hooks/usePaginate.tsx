@@ -1,5 +1,4 @@
-import { usePathname, useSearchParams } from "next/navigation";
-import { useRouter } from "next/navigation";
+import { usePathname, useSearchParams, useRouter } from "next/navigation";
 import { useCallback } from "react";
 
 const usePaginate = () => {
@@ -10,9 +9,16 @@ const usePaginate = () => {
     const setQueryString = useCallback(
         (name: string, value: string) => {
             const params = new URLSearchParams(searchParams.toString());
+
+            if (!(["page", "perPage"].includes(name))) {
+                params.set("page", "1");
+            }
+
             params.set(name, value);
 
-            router.push(pathname + "?" + params.toString());
+            router.push(pathname + "?" + params.toString(), {
+                scroll: false
+            });
 
             return params.toString();
         },
@@ -41,7 +47,9 @@ const usePaginate = () => {
 
     const setField = (name: string, value: any) => {
         const params = new URLSearchParams(searchParams);
+
         params.delete(name);
+        params.set("page", "1");
 
         if (value instanceof Array) {
             const queryArr = value.map((val) => `${name}=${val}`).join("&");
@@ -53,7 +61,9 @@ const usePaginate = () => {
             const queryStr = Object.entries(value).map(([key, value]) => {
                 return `${name}[${key}]=${value}`
             }).join("&");
-            router.push(pathname + "?" + params.toString() + "&" + queryStr)
+            router.push(pathname + "?" + params.toString() + "&" + queryStr, {
+                scroll: false
+            })
             return;
         }
 
@@ -64,7 +74,9 @@ const usePaginate = () => {
         const params = new URLSearchParams(searchParams.toString());
         params.delete(name);
 
-        router.push(pathname + "?" + params.toString());
+        router.push(pathname + "?" + params.toString(), {
+            scroll: false
+        });
 
         return params.toString();
     }

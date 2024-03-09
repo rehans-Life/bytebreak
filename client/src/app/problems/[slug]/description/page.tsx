@@ -13,8 +13,6 @@ import { FaRadiationAlt } from "@react-icons/all-files/fa/FaRadiationAlt"
 import capitalize from 'capitalize';
 import ContentSkeleton from '@/skeletons/content-skeleton';
 import { Skeleton } from '@/components/ui/skeleton';
-import Discussions from '@/app/components/discussions';
-
 
 const MarkdownPreview = dynamic(
     () => import("@uiw/react-markdown-preview").then((mod) => mod.default),
@@ -38,7 +36,7 @@ export default function Page() {
         <div className='text-white p-5 flex flex-col gap-y-3.5 min-w-96 w-full sm:h-full h-80'>
             <div className='flex items-center justify-between gap-x-3'>
                 <div className='text-2xl font-semibold'>{capitalize.words(problem?.name || "",)}</div>
-                {
+                {!(problemStatus.status === 'error') ?
                     problemStatus.isLoading
                         ?
                         <div className='flex items-center gap-x-1'>
@@ -60,7 +58,7 @@ export default function Page() {
                                 }
                             </div>
                         </div>
-                }
+                    : <></>}
             </div>
             <div className='flex items-center  flex-wrap gap-2'>
                 <Badge variant="secondary" className='bg-dark-divider-border-2 hover:bg-dark-divider-border-2'>

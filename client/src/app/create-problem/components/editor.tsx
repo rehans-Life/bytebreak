@@ -20,7 +20,7 @@ interface LangConfig {
 }
 
 const langAtom = atom<Option<langs> | undefined>(undefined);
-const codesAtom = atom<{ [key: string]: LangConfig }>({});
+export const codesAtom = atom<{ [key: string]: LangConfig }>({});
 
 const setLangAtom = atom(null, (get, set, option: Option<langs>, config: ProblemConfig) => {
   set(langAtom, option)
@@ -79,6 +79,8 @@ export default function Editor() {
   }, [lang])
 
   useEffect(() => {
+    if (lang) return;
+
     if (!langs.length) return;
     const firstLang = langs[0];
 

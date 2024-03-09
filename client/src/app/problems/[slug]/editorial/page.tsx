@@ -4,7 +4,7 @@ import { getEditorial } from '@/utils/api';
 import { useQuery } from '@tanstack/react-query';
 import dynamic from 'next/dynamic';
 import React from 'react'
-import EditorialSkeleton from '../../../../skeletons/editorial-skeleton';
+import EditorialSkeleton from '@/skeletons/editorial-skeleton';
 
 const MarkdownPreview = dynamic(
     () => import("@uiw/react-markdown-preview").then((mod) => mod.default),

@@ -11,6 +11,10 @@ export default function Provider({
 }) {
   const [queryClient] = useState(new QueryClient({
     queryCache: new QueryCache({
+      onError: (error, query) => {
+        if (!query.meta?.onError || typeof query.meta?.onError !== 'function') return;
+        query.meta.onError(error)
+      },
       onSuccess: (data, query) => {
         if (!query.meta?.onSuccess || typeof query.meta?.onSuccess !== 'function') return;
         query.meta.onSuccess(data)
