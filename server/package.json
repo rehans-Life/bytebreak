@@ -6,7 +6,10 @@
   "scripts": {
     "build": "npx tsc",
     "start:dev": "NODE_ENV=Development nodemon ./src/server.ts",
-    "start:prod": "NODE_ENV=Production node ./dist/src/server.js"
+    "start:prod": "NODE_ENV=Production node ./dist/src/server.js",
+    "lint": "eslint src/**/*.ts",
+    "format": "eslint src/**/*.ts --fix"
+
   },
   "keywords": [],
   "author": "",
@@ -56,6 +59,8 @@
     "@types/morgan": "^1.9.9",
     "@types/multer": "^1.4.11",
     "@types/uuid": "^9.0.8",
-    "@types/validator": "^13.11.8"
+    "@types/validator": "^13.11.8",
+    "@typescript-eslint/eslint-plugin": "^7.1.1",
+    "@typescript-eslint/parser": "^7.1.1"
   }
 }

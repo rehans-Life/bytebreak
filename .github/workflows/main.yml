@@ -1,0 +1,27 @@
+name: CI Build
+
+on:
+  push:
+    branches:
+      - "**"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checking out branch
+        uses: actions/checkout@v2
+
+      - name: Set up Nodejs
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20.x
+
+      - name: Installing Packages And Linting in Client
+        run: cd client && npm install && npm run lint
+
+      - name: Going back to root
+        run: cd ..
+
+      - name: Installing Packages And Linting in Server
+        run: cd server && npm install && npm run lint

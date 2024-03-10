@@ -1,8 +1,5 @@
 version: '3'
 
-include:
-  - ./judge0/docker-compose.yml
-
 services:
   nginx:
     restart: always

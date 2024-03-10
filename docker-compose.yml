@@ -1,6 +1,7 @@
 version: '3'
 
-include: ./judge0/docker-compose.yml
+include: 
+   - ./judge0/docker-compose.yml 
 
 services:
   nginx:
@@ -34,5 +35,3 @@ services:
       - FIREBASE_STORAGE_URI=$FIREBASE_STORAGE_URI
       - FRONTEND_URI=$FRONTEND_URI
       - JUDGE0_API=$JUDGE0_API
-      - RAPID_API_HOST=$RAPID_API_HOST
-      - RAPID_API_KEY=$RAPID_API_KEY
