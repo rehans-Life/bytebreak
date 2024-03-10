@@ -101,21 +101,21 @@ export default function LeftFooter({
             </div>
             <VertDivider />
             <div className='flex items-center gap-x-2 text-dark-label-1'>
-                <Tooltip message='Star' children={
+                <Tooltip message='Star'>
                     <div className=' hover:bg-dark-fill-2 py-1.5 px-1.5 rounded-md'>
                         <FaRegStar />
                     </div>
-                }></Tooltip>
-                <Tooltip message='Share' children={
+                </Tooltip>
+                <Tooltip message='Share'>
                     <div className=' hover:bg-dark-fill-2 py-1.5 px-1.5 rounded-md'>
                         <RiShareBoxLine />
                     </div>
-                }></Tooltip>
-                <Tooltip message='Feedback' children={
+                </Tooltip>
+                <Tooltip message='Feedback'>
                     <div className=' hover:bg-dark-fill-2 py-1.5 px-1.5 rounded-md'>
                         <FaRegQuestionCircle />
                     </div>
-                }></Tooltip>
+                </Tooltip>
             </div>
         </div>
     )

@@ -48,15 +48,6 @@ export default function Page() {
 
     const user = useAtomValue(userAtom)
 
-    if (!user) {
-        return <div className='flex flex-col items-center justify-center gap-y-4 w-full overflow-x-auto min-w-96 sm:h-full h-80'>
-            <div className='text-dark-label-2 text-sm'>View your Submission records here</div>
-            <Link href="/login" className='px-3 py-2 text-sm rounded-lg text-white font-medium bg-dark-green-s hover:bg-dark-green-hover'>
-                Register or Sign in
-            </Link>
-        </div>
-    }
-
     const problem = useAtomValue(problemAtom);
     const languageConfigs = useAtomValue(languagesAtom)
 
@@ -81,7 +72,8 @@ export default function Page() {
     const [submissions] = useQueries({
         queries: [
             {
-                queryKey: ['submissions', problem?._id, user._id],
+                queryKey: ['submissions', problem?._id, user?._id],
+                enabled: typeof user !== 'undefined',
                 queryFn: getSubmissions
             },
             {
@@ -112,6 +104,15 @@ export default function Page() {
         month: 'short',
         year: 'numeric',
     } as const)
+
+    if (!user) {
+        return <div className='flex flex-col items-center justify-center gap-y-4 w-full overflow-x-auto min-w-96 sm:h-full h-80'>
+            <div className='text-dark-label-2 text-sm'>View your Submission records here</div>
+            <Link href="/login" className='px-3 py-2 text-sm rounded-lg text-white font-medium bg-dark-green-s hover:bg-dark-green-hover'>
+                Register or Sign in
+            </Link>
+        </div>
+    }
 
     return (
         <div className='text-white flex flex-col gap-y-2 w-full overflow-x-auto min-w-96 sm:h-full h-80'>
