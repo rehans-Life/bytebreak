@@ -1,9 +1,9 @@
-import Select, { Option } from '@/app/components/select'
+import Select from '@/app/components/select'
 import React, { useEffect, useRef } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
-import { ProblemConfig, ProblemType } from '../interfaces'
+import { ProblemType } from '../interfaces'
 import { langs } from 'lang-code-configuration/data'
-import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai'
+import { useAtom, useAtomValue, useSetAtom } from 'jotai'
 import { languagesAtom } from '../../../atoms/tagAtoms'
 import { convert } from '@/utils/convert'
 import RestrictedEditor from '@/app/components/restricted-editor'
@@ -12,42 +12,8 @@ import TooltipContainer from '@/app/components/tooltip'
 import { CgFormatLeft } from "@react-icons/all-files/cg/CgFormatLeft";
 import { editor } from 'monaco-editor'
 import { RiArrowGoBackLine } from "@react-icons/all-files/ri/RiArrowGoBackLine";
-
-
-interface LangConfig {
-  restrictedLines: number[],
-  code: string
-}
-
-const langAtom = atom<Option<langs> | undefined>(undefined);
-export const codesAtom = atom<{ [key: string]: LangConfig }>({});
-
-const setLangAtom = atom(null, (get, set, option: Option<langs>, config: ProblemConfig) => {
-  set(langAtom, option)
-
-  const codesMap = get(codesAtom);
-
-  if (!(option.value in codesMap)) {
-    const code = generateCodeConfig(option.value as langs, config);
-    const restrictedLines = code.split("\n").reduce<number[]>((acc, curr, i) => curr.trim().length ? [...acc, i + 1] : acc, [])
-
-    set(codesAtom, {
-      ...codesMap,
-      [option.value]: {
-        code,
-        restrictedLines
-      }
-    })
-  }
-});
-
-function usePrevious<T>(value: T): T | undefined {
-  const ref = useRef<T>();
-  useEffect(() => {
-    ref.current = value;
-  }, [value])
-  return ref.current
-}
+import { codesAtom, langAtom, setLangAtom } from '@/atoms/codeEditorAtoms'
+import usePrevious from '@/hooks/usePrevious'
 
 export default function Editor() {
   const { control, setValue, getValues } = useFormContext<ProblemType>();
@@ -73,7 +39,7 @@ export default function Editor() {
       'solution',
       {
         languageId: langs.find(({ slug }) => lang!.value === slug)!._id,
-        code: codes[lang.value].code
+        code: codes[lang.value]?.code || ""
       }
     )
   }, [lang])

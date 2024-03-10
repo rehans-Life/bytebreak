@@ -16,6 +16,7 @@ interface IProblem {
   user: Types.ObjectId
   slug: string
   description: string
+  totalTestcases: number
   difficulty: 'easy' | 'medium' | 'hard'
   config: ProblemConfig
   accepted: number
@@ -133,6 +134,10 @@ const ProblemSchema = new Schema<IProblem>(
       type: [Number],
       ref: 'Tag',
       default: [],
+    },
+    totalTestcases: {
+        type: Number,
+        default: 0,
     },
     solution: {
       type: {

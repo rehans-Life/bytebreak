@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect } from 'react'
+import React, { useEffect, useTransition } from 'react'
 import Tooltip from "@/app/components/tooltip";
 import { FiSettings } from '@react-icons/all-files/fi/FiSettings';
 import { IoCloudUpload } from '@react-icons/all-files/io5/IoCloudUpload';
@@ -54,6 +54,8 @@ export const isExecutingAtom = atom<boolean>(false);
 
 export default function Header() {
     const router = useRouter();
+    const [isRouting, startTransition] = useTransition();
+
     const queryClient = useQueryClient()
 
     const user = useAtomValue(userAtom);
@@ -83,7 +85,9 @@ export default function Header() {
         meta: {
             onSuccess: (submission: SubmissionDoc) => {
                 queryClient.setQueryData(['submissions', submission._id], submission);
-                router.push(`/problems/${problem?.slug}/submissions/${submission._id}`);
+                startTransition(() => {
+                    router.push(`/problems/${problem?.slug}/submissions/${submission._id}`);
+                })
             }
         },
         mutationFn: submitCode,
@@ -120,7 +124,6 @@ export default function Header() {
             if (error.response && [409, 417].some((code) => error.response?.status === code)) {
                 (error.response?.data as any).code = error.response.status;
                 const data = error!.response!.data as (InvalidTestcase | CodeError)
-                console.log(data);
                 setExecutionResult(data);
             } else {
                 toast.error(error.message)
@@ -147,13 +150,14 @@ export default function Header() {
             </Link>
             <div className='flex items-center relative overflow-hidden gap-x-[2px]'>
 
-                <div className={`absolute ml-auto mr-auto left-0 right-0 h-full rounded-md ${submit.isPending || run.isPending ? 'w-full' : 'w-0'} overflow-hidden bg-gray-8 flex items-center justify-center gap-x-1.5 text-dark-gray-6 text-sm transition-all ease-out duration-100`}>
+                <div className={`absolute ml-auto mr-auto left-0 right-0 h-full rounded-md ${submit.isPending || run.isPending || isRouting ? 'w-full' : 'w-0'} overflow-hidden bg-gray-8 flex items-center justify-center gap-x-1.5 text-dark-gray-6 text-sm transition-all ease-out duration-100`}>
                     <CgSpinner className='text-lg animate-spin dark-gray-6' />
                     Pending...
                 </div>
                 <Tooltip
                     message={'Run'}
                     onClick={() => {
+                        if (run.isPending || submit.isPending) return;
                         onRun()
                     }}
                     side='left'

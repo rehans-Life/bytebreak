@@ -10,6 +10,7 @@ import { getDefaultCodeConfiguration as generateCode } from 'lang-code-configura
 import { batchSubmission } from './judge0Controller'
 import Comment from '../models/Comment'
 import { PaginateProbelmQuery } from '../utils/apiFeatures'
+import { paginationPipeline } from '../utils/paginationPipeline'
 
 type Params = {identifier: string}
 
@@ -105,9 +106,12 @@ export const parseTagsField: RequestHandler = catchAsync(async (req, _, next) =>
 
 export const getProblems: RequestHandler = catchAsync(async (req, res) => {
   let { page, limit, fields, filter } = req.query as unknown as PaginateProbelmQuery;
-  
-  const problems = await Problem.aggregate()
-  .lookup({
+ 
+  if(!page) page = "1";
+  if(!limit) limit = "10";
+
+  const [problems] = await Problem.aggregate(req.user ? [
+    ...Problem.aggregate().lookup({
     localField: "_id",
     foreignField: "problem",
     from: 'submissions',
@@ -148,28 +152,35 @@ export const getProblems: RequestHandler = catchAsync(async (req, res) => {
     preserveNullAndEmptyArrays: true,
   })
   .append({ $set: 
-    { 
-      status: { 
-        $cond: { 
-          if: { $or: 
-            [ 
-              { $eq: ["$status.status", "solved"] }, 
-              { $eq: ["$status.status", "attempted"] } 
-            ] }, 
-          then: '$status.status', 
-          else: 'todo',
-        } 
-    } 
-  } 
-  })
-  .match(filter as { [x: string]: any })
-  .skip((Number(page) - 1) * Number(limit))
-  .limit(Number(limit))
-  .project(fields as unknown as { [key: string]: any })
+      { 
+        status: { 
+          $cond: { 
+            if: { $or: 
+              [ 
+                { $eq: ["$status.status", "solved"] }, 
+                { $eq: ["$status.status", "attempted"] } 
+              ] }, 
+            then: '$status.status', 
+            else: 'todo',
+          } 
+        },
+        user: { 
+          $toString: "$user"
+        },
+    },
+  }).pipeline(), ...paginationPipeline(Problem, 'problems', {
+    page, fields, limit, filter
+  })] : paginationPipeline(Problem, 'problems', {
+    page, fields, limit, filter
+  }))
 
   return res.status(200).json({
     status: "success",
-    data: problems
+    data: problems || {
+      problems: [],
+      total: 0,
+      maxPage: 1,
+    }
   });
 })
 
@@ -204,22 +215,29 @@ export const createProblem: RequestHandler = catchAsync(
 
       if (submission.status.id >= 5) {
         console.log(submission.stderr)
-        throw new AppError(`An error occured while executing your solution code please try again after fixing it`, 417)
+        throw new AppError(`An error occured while executing your solution code against the testcases please try again after fixing it`, 417)
       }
     })
 
     const problem = await Problem.create({
       ...req.body,
-      user: req.user._id
+      user: req.user._id,
     })
 
-    await Promise.all(
+    const addedTestcases = await Promise.all(
       (testcases as TestCases).map(async (testcase) => {
         return TestCase.create({ ...testcase, problem: problem._id }).catch(
           () => ({}),
         )
       }),
     )
+
+    problem.totalTestcases = addedTestcases.reduce<number>((acc, curr) => {
+      if (!Object.entries(curr).length) return acc;
+      return acc + 1;
+    }, 0);
+
+    await problem.save();
 
     const editorial = await Comment.create({
       text: req.body.editorial,
@@ -228,7 +246,7 @@ export const createProblem: RequestHandler = catchAsync(
     })
 
     await Problem.populate(problem, {
-      path: 'testcases',
+      path: 'sampleTestCases',
     })
 
     await Problem.populate(problem, {

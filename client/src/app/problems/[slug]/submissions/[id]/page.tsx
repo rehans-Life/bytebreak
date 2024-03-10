@@ -82,7 +82,7 @@ export default function Page({
                         data?.status !== 'Accepted' &&
                         <>
                             <VertDivider />
-                            <div className='text-xs text-dark-gray-6'>{data?.testCasesPassed} / 0 testcases passed</div>
+                            <div className='text-xs text-dark-gray-6'>{data?.testCasesPassed} / {data?.problem?.totalTestcases || 0} testcases passed</div>
                         </>
                     }
                 </div>

@@ -7,8 +7,8 @@ export function Section({
     children
 }: { children: ReactNode, className?: string }) {
     return (
-        <div className='border-dark-gray-6 h-full border rounded-md overflow-hidden'>
-            <div className={`${className} h-full flex flex-col bg-dark-layer-1`}>
+        <div className='border-dark-gray-6 h-full border relative rounded-md overflow-hidden'>
+            <div className={`${className} h-full relative flex flex-col bg-dark-layer-1`}>
                 {children}
             </div>
         </div>

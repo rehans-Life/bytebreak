@@ -54,16 +54,16 @@ const extractToken: (req: Request) => string | undefined = (req: Request) => req
 export const setUser: RequestHandler = catchAsync(async (req, _, next) => {
   const token = extractToken(req);
 
-  if (!token) return;
+  if (!token) return next();
 
   try {
     var { id } = verifyToken(token) as { id: string }
   } catch (err){
-     return;
+     return next();
   }
 
   const user = await User.findById(id)
-  if (!user) return;
+  if (!user) return next();
 
   req.user = user;
 
@@ -93,7 +93,7 @@ export const protect: RequestHandler = catchAsync(async (req, _, next) => {
   const user = await User.findById(id)
 
   if (!user) {
-    throw new AppError('No user exists corresponding to the given token')
+    throw new AppError('No user exists corresponding to the given token', 404)
   }
 
   req.user = user
@@ -104,6 +104,13 @@ export const protect: RequestHandler = catchAsync(async (req, _, next) => {
 export const signup: RequestHandler = catchAsync(async (req, res, next) => {
   delete req.body.role
   delete req.body.active
+
+  const reg = new RegExp(/[^\_a-z1-9\-]/gi);
+
+  if(req.body.username?.match(reg)) {
+    throw new AppError("The username must contain only letters, numbers, hyphens and underscores", 401);
+  }
+
   const user = await User.create(req.body)
   createSendToken(user, 201, res)
 })
@@ -130,6 +137,31 @@ export const login: RequestHandler = catchAsync(async (req, res, next) => {
 
   createSendToken(user, 202, res)
 })
+
+export const getGoogleUser: RequestHandler = catchAsync(async (req, res, next) => {
+  const userId = req.params.id;
+
+  if (!userId) throw new AppError("Please provide a user id", 404)
+
+  const user = await User.findOne({ userId: { $exists: true, $eq: userId } });
+
+  if (!user) throw new AppError("No User found", 404);
+
+  createSendToken(user, 202, res);
+});
+
+export const createGoogleUser: RequestHandler = catchAsync(async (req, res, next) => {
+  const { userId, email, username, photo } = req.body;
+  const user = await User.create({
+    userId,
+    username,
+    email,
+    photo,
+    password: userId,
+    confirmPassword: userId
+  });
+  createSendToken(user, 201, res);
+}) 
 
 export const logout = catchAsync(async (req, res, next) => {
   res.cookie('jwt', 'LOGGED OUT', {

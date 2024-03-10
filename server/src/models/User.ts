@@ -5,11 +5,14 @@ import bcrypt from 'bcrypt'
 export interface IUser {
   username: string
   email: string
+  userId?: string
   password?: string
   active: boolean
   role: 'admin' | 'user'
   photo: string
   confirmPassword: undefined
+  createdAt: string
+  updatedAt: string
 }
 
 export interface IUserMethods {
@@ -41,6 +44,10 @@ const UserSchema = new Schema<IUser, UserModel, IUserMethods>(
         validator: (value: string) => validator.isEmail(value),
         message: 'Please provide a valid email for creating an account',
       },
+    },
+    userId: {
+      type: String,
+      unqiue: true
     },
     active: {
       type: Boolean,
@@ -79,6 +86,8 @@ const UserSchema = new Schema<IUser, UserModel, IUserMethods>(
     timestamps: true,
   },
 )
+
+UserSchema.index({ userId: 1 }, { unique: true })
 
 UserSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next()

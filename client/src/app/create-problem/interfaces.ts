@@ -48,6 +48,7 @@ export interface Problem extends ProblemInfo {
   }
   acceptanceRate: number
   sampleTestCases: Testcase[]
+  totalTestcases: number
   createdAt: string
 }
 

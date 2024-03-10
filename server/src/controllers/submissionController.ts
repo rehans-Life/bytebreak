@@ -8,6 +8,8 @@ import Submission from "../models/Submission";
 import { getAll, getOne } from "./handlerFactory";
 import catchAsync from "../utils/catchAsync";
 import mongoose from "mongoose";
+import { PaginateProbelmQuery } from "../utils/apiFeatures";
+import { paginationPipeline } from "../utils/paginationPipeline";
 
 const testCasesSchema = z.array(testcaseSchema)
 
@@ -171,14 +173,81 @@ export const getSubmissionStatus = catchAsync(async (req, res, next) => {
     })
 })
 
-export const getSubmissions = getAll(Submission, [
-    {
-        path: "language",
-    }, 
-    { 
-        path: "lastExecutedTestcase" 
+export const getSubmissions =  catchAsync(async (req, res, next) => {
+    let { page, limit, fields, filter } = req.query as unknown as PaginateProbelmQuery;
+
+  const [submissions] = await Submission.aggregate([
+    ...Submission.aggregate()
+    .append({
+        $set: {
+            problem: { 
+                $toString: "$problem"
+            },
+            user: {
+                $toString: "$user",
+            }
+        }
+    })    
+    .pipeline(),
+    ...paginationPipeline(Submission, 'submissions', {
+            page, fields, limit, filter
+        }),
+    ...Submission.aggregate()
+    .unwind({
+        path: "$submissions"
+    })
+    .append({
+        $set: {
+            "submissions.problem": { $toObjectId: "$submissions.problem" },
+            "submissions.user": { $toObjectId: "$submissions.user" }
+        }
+    })
+    .lookup({
+        localField: "submissions.language",
+        foreignField: "_id",
+        from: 'tags',
+        as: "submissions.language"
+    })
+    .unwind({ path: "$submissions.language", preserveNullAndEmptyArrays: true })
+    .lookup({
+        localField: "submissions.lastExecutedTestcase",
+        foreignField: "_id",
+        from: 'testcases',
+        as: "submissions.lastExecutedTestcase"
+    })
+    .unwind({ path: "$submissions.lastExecutedTestcase",  preserveNullAndEmptyArrays: true })
+    .lookup({
+        localField: "submissions.problem",
+        foreignField: "_id",
+        from: 'problems',
+        as: "submissions.problem"
+    })
+    .unwind({ path: "$submissions.problem",  preserveNullAndEmptyArrays: true })
+    .lookup({
+        localField: "submissions.user",
+        foreignField: "_id",
+        from: 'users',
+        as: "submissions.user"
+    })
+    .unwind({ path: "$submissions.user",  preserveNullAndEmptyArrays: true })
+    .group({
+        _id: "",
+        submissions: { $push: "$submissions" },
+        maxPage: { $first: "$maxPage" },
+        total: { $first: "$total" }
+    })
+    .pipeline()
+    ])
+
+  return res.status(200).json({
+    status: "success",
+    data: submissions || {
+      submissions: [],
+      total: 0,
+      maxPage: 1,
     }
-])
+  });
+})
 
 export const getSubmission = getOne(Submission, [
     {
@@ -186,5 +255,11 @@ export const getSubmission = getOne(Submission, [
     }, 
     { 
         path: "lastExecutedTestcase" 
+    },
+    {
+        path: "user"
+    },
+    {
+        path: "problem"
     }
 ])

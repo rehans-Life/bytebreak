@@ -1,6 +1,6 @@
 import { NextFunction, Response, Request, RequestHandler } from 'express'
 import sharp from 'sharp'
-import storage from '../../config/firebase'
+import {storage} from '../../config/firebase'
 import { v4 as uuid } from 'uuid'
 import catchAsync from '../utils/catchAsync'
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage'

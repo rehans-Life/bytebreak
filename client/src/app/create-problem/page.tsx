@@ -14,7 +14,7 @@ import { Problem, ProblemType, types } from './interfaces'
 import ConfigForm from './components/configForm'
 import { ProblemSchema } from './schemas'
 import { useAtomValue, useSetAtom } from 'jotai'
-import { tagsAtom, topicsAtom } from '../../atoms/tagAtoms'
+import { languagesAtom, tagsAtom, topicsAtom } from '../../atoms/tagAtoms'
 import { useMutation, useSuspenseQuery, useQueryClient, } from '@tanstack/react-query'
 import axios from '../../utils/axios'
 import { ApiSuccessResponse, Comment, LanguageTag, TopicTag } from '../interfaces'
@@ -26,8 +26,10 @@ import '@uiw/react-markdown-editor/markdown-editor.css';
 import '@uiw/react-markdown-preview/markdown.css';
 import dynamic from 'next/dynamic'
 import MarkdownSkeleton from '../../skeletons/markdown-skeleton'
-import { codesAtom } from './components/editor'
-import Header from '../components/header'
+import { LangConfig, codesAtom, setRestrictedLines } from '@/atoms/codeEditorAtoms'
+import { userAtom } from '@/atoms/userAtom'
+import { showSignInToast } from '@/toasts/signInReminder'
+import generateCodeConfig from '@/utils/generateCodeConfig'
 
 const MarkdownEditor = dynamic(
   () => import("@uiw/react-markdown-editor").then((mod) => mod.default),
@@ -63,10 +65,25 @@ const descDefaultMarkup =
 const editroialDefaultMarkup =
   '## Solution\n\n<!-- Type of Approach either brute force, optimal or sub-optimal -->\n### Approach 1: Brute force\n\n#### Intuition\n<!-- Describe your first thoughts on how to solve this problem. -->\n\n#### Algorithm\n<!-- Describe your approach to solving the problem. -->\n\n#### Implementation \n```\ncode for solving the problem.\n```\n\n#### Complexity Analysis \n- Time complexity:\n<!-- Add your time complexity here, e.g. *O(n)* -->\n- Space complexity: \n<!-- Add your space complexity here, e.g. *O(n)* -->\n\n#'
 
+const defaultConifg = {
+  funcName: "func_name",
+  returnType: types[0],
+  params: [
+    {
+      name: 'param1',
+      type: types[0],
+    },
+  ],
+};
+
 export default function Create() {
+  const user = useAtomValue(userAtom);
+
   const setTags = useSetAtom(tagsAtom)
   const setCodes = useSetAtom(codesAtom)
+
   const topics = useAtomValue(topicsAtom)
+  const languages = useAtomValue(languagesAtom)
 
   const router = useRouter()
   const queryClient = useQueryClient()
@@ -109,8 +126,15 @@ export default function Create() {
       queryClient.setQueryData(['problems', data.problem.slug], data.problem)
       queryClient.setQueryData(['editorial', data.problem.slug], data.editorial)
       router.push(`/problems/${data.problem.slug}`)
-      setCodes({})
       reset();
+      setCodes(languages.reduce<{ [key: string]: LangConfig }>((acc, lang) => {
+        const code = generateCodeConfig(lang.slug, defaultConifg)
+        acc[lang.slug] = {
+          code,
+          restrictedLines: setRestrictedLines(code)
+        }
+        return acc;
+      }, {} as { [key: string]: LangConfig }));
     },
     throwOnError: false,
   })
@@ -137,6 +161,10 @@ export default function Create() {
   const { control, handleSubmit, reset } = methods
 
   const addProblem: SubmitHandler<ProblemType> = async (problem) => {
+    if (!user) {
+      showSignInToast("You must log in first");
+      return;
+    }
     mutate(problem)
   }
 

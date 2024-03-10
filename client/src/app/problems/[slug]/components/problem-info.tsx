@@ -26,7 +26,7 @@ export default function ProblemInfo({
 
 
     return (
-        <Section className='overflow-auto'>
+        <Section>
             <SectionHeader>
                 <div onClick={() => setCurrTab("description")}>
                     <SectionTab onClick={() => router.push(`/problems/${slug}/description`)} active={currTab === 'description'}>
@@ -54,7 +54,9 @@ export default function ProblemInfo({
                 </div>
             </SectionHeader>
             <SectionBody>
-                {children}
+                <div className='overflow-y-scroll'>
+                    {children}
+                </div>
             </SectionBody>
             <SectionFooter>
                 <LeftFooter problemId={_id}></LeftFooter>

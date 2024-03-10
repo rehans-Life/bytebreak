@@ -1,5 +1,7 @@
 import { Router } from 'express'
 import {
+  getGoogleUser,
+  createGoogleUser,
   login,
   logout,
   protect,
@@ -15,6 +17,9 @@ import {
   getUsers,
   updateMe,
   updateUser,
+  userCalender,
+  userInfo,
+  userSubmissionsCount,
 } from '../controllers/userController'
 import { getOne } from '../controllers/handlerFactory'
 import User from '../models/User'
@@ -37,6 +42,13 @@ router.post('/login', login)
 router.post('/signup', signup)
 router.post('/upload', upload.single('avatar'), resizeUserImage, uploadPhoto)
 router.post('/logout', logout)
+
+router.route("/google/:id").get(getGoogleUser)
+router.route("/google").post(createGoogleUser);
+
+router.route("/user-calender/:username").get(userCalender);
+router.route("/user-submissions-count/:username").get(userSubmissionsCount);
+router.route("/user-info/:username").get(userInfo);
 
 router.use(protect)
 

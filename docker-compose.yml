@@ -1,11 +1,38 @@
 version: '3'
 
-include:
-  ./judge0/docker-compose.yml
+include: ./judge0/docker-compose.yml
 
 services:
-  api:
-    build: ./server
+  nginx:
+    restart: always
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    ports:
+      - '8080:80'
+  client:
+    restart: always
     environment:
+      - FIREBASE_STORAGE_URI=$FIREBASE_STORAGE_URI
+      - NEXT_PUBLIC_AUTH_DOMAIN=$NEXT_PUBLIC_AUTH_DOMAIN
+      - NEXT_PUBLIC_API_KEY=$NEXT_PUBLIC_API_KEY
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+  api:
+    restart: always
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    environment:
+      - PORT=4000
       - DP_PASSWORD=$DP_PASSWORD
       - DB_URI=$DP_URI
+      - JWT_SECRET_KEY=$JWT_SECRET_KEY
+      - JWT_EXPIRES_IN=$JWT_EXPIRES_IN
+      - JWT_COOKIE_EXPIRES_IN=$JWT_COOKIE_EXPIRES_IN
+      - FIREBASE_STORAGE_URI=$FIREBASE_STORAGE_URI
+      - FRONTEND_URI=$FRONTEND_URI
+      - JUDGE0_API=$JUDGE0_API
+      - RAPID_API_HOST=$RAPID_API_HOST
+      - RAPID_API_KEY=$RAPID_API_KEY

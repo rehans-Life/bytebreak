@@ -7,6 +7,7 @@ import mongoose, { HydratedDocument } from 'mongoose'
 import capitalize from 'capitalize'
 import AppError from '../utils/appError'
 import { statuses } from '../models/Submission'
+import Problem from '../models/Problem'
 
 export const getTags: RequestHandler = getAll(Tour)
 
@@ -23,6 +24,42 @@ export const setRef: (name: string) => RequestHandler = (name) => (req, res, nex
     req.ref = name;
     next()
 }
+
+export const allQuestionsCount: RequestHandler = catchAsync(async (req, res, next) => {
+    const [problemsCount] = await Problem.aggregate([{ $group: {
+            _id: "",
+            total: { $count: {} },
+            easy: { $sum: { $cond: {
+                    if: { $eq: ["$difficulty", "easy"] },
+                    then: 1,
+                    else: 0 
+                } }
+            },
+            medium: { $sum: { $cond: {
+                    if: { $eq: ["$difficulty", "medium"] },
+                    then: 1,
+                    else: 0 
+                } },
+            },
+            hard: { $sum: { $cond: {
+                    if: { $eq: ["$difficulty", "hard"] },
+                    then: 1,
+                    else: 0 
+                } }
+            }
+        }},
+        {
+            $project: { _id: 0 }
+        }
+    ]);
+
+    return res.status(200).json({
+        status: "success",
+        data: {
+            problemsCount
+        }
+    })
+})
 
 export const getParent = async function (ref: string, id: string): Promise<HydratedDocument<any, any>> {
     const parentDoc: HydratedDocument<any, any> = await mongoose

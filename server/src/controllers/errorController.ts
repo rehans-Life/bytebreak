@@ -2,7 +2,7 @@ import { Response, Request, NextFunction } from 'express'
 import keys from '../../config/keys'
 import AppError from '../utils/appError'
 import { MongoServerError } from 'mongodb'
-import { CastError } from 'mongoose'
+import { CastError, MongooseError } from 'mongoose'
 import { ZodError } from 'zod'
 
 class MongooseCastError implements CastError {
@@ -18,6 +18,12 @@ class MongooseCastError implements CastError {
     public path: string,
     public stringValue: string,
   ) {}
+}
+
+function handleValidationError(error: MongooseError) {
+  const errorMsg = `${Object.values((error as any).errors).reduce((acc: string, curr: any) => !acc.length ? curr.message : `${acc}, ${curr.message}` ,"")}.`;
+
+  return new AppError(errorMsg, 400)
 }
 
 function handleDuplicateKeyError(error: MongoServerError) {
@@ -103,7 +109,7 @@ export default (error: Error, req: Request, res: Response, _: NextFunction) => {
 
   if (error instanceof MongooseCastError && error.name === 'CastError')
     appError = buildCastError(error)
-  if (error.name === 'ValidationError') appError.statusCode = 400
+  if (error.name === 'ValidationError') appError = handleValidationError(error);
   if (error instanceof MongoServerError && error.code === 11000)
     appError = handleDuplicateKeyError(error)
   if (error.name === 'JsonWebTokenError') appError = handleJWTMalformedError()

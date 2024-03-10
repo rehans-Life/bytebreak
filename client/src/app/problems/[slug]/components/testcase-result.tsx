@@ -1,7 +1,7 @@
 import CodeError from '@/app/components/code-error';
-import { executionResultAtom } from '@/atoms/testcaseAtoms';
+import { executionResultAtom, selectedTestcaseAtom, testcaseTabAtom } from '@/atoms/testcaseAtoms';
 import TestcaseResultSkeleton from '@/skeletons/testcase-result-skeleton';
-import { useAtomValue } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
 import React, { ReactNode, useState } from 'react'
 import Cases from './cases';
 import { problemAtom } from '@/atoms/problemAtoms';
@@ -15,6 +15,9 @@ function ValueHolder({ children }: { children: ReactNode }) {
 
 export default function TestcaseResult() {
     const [selectedResult, setSelectedResult] = useState(0);
+
+    const setSelectedTab = useSetAtom(testcaseTabAtom);
+    const setSelectedTestcase = useSetAtom(selectedTestcaseAtom);
 
     const isExecuting = useAtomValue(isExecutingAtom);
     const problem = useAtomValue(problemAtom);
@@ -46,7 +49,13 @@ export default function TestcaseResult() {
                 <>
                     <div className='text-xl text-dark-red font-semibold'>Invalid Testcase</div>
                     <div className='flex flex-col gap-y-2'>
-                        <div className='text-sm font-medium text-dark-gray-8'>Case {executionResult.testcaseNo + 1}</div>
+                        <div className='flex items-center justify-between'>
+                            <div className='text-xs font-medium text-dark-label-1'>Case {executionResult.testcaseNo + 1}</div>
+                            <div className='cursor-pointer text-xs font-medium text-dark-label-1' onClick={() => {
+                                setSelectedTab(0);
+                                setSelectedTestcase(executionResult.testcaseNo)
+                            }}>Edit</div>
+                        </div>
                         <CodeError errorMsg={executionResult.message} />
                     </div>
                 </>

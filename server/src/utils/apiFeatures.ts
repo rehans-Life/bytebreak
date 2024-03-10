@@ -3,7 +3,7 @@ import { Query } from 'mongoose'
 
 type QueryField = 'page' | 'limit' | 'sort' | 'fields'
 
-interface QueryObj {
+export interface QueryObj {
   page?: number
   limit?: number
   sort?: string
@@ -11,8 +11,8 @@ interface QueryObj {
 }
 
 export interface PaginateProbelmQuery {
-  page: string,
-  limit: string,
+  page?: string,
+  limit?: string,
   fields: string,
   filter: { [key: string]: any }
 }
@@ -27,8 +27,6 @@ class ApiFeatures {
     let { page, limit, fields } = req.query;
     const excludedFields = ["page", "limit", "fields"];
   
-    if(!page) page = "1";
-    if(!limit) limit = "10";
     if(fields) fields = fields.toString().replace(/\,/g, ' ');
     else fields = "-__v";
   
