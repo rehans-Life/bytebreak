@@ -117,7 +117,7 @@ export const getProblems: RequestHandler = catchAsync(async (req, res) => {
   let { page, limit } = req.query as unknown as PaginateProbelmQuery
   const { fields, filter } = req.query as unknown as PaginateProbelmQuery
 
-  if (!page) page = '1'
+  if (!page) page = 1
   if (!limit) limit = '10'
 
   const [problems] = await Problem.aggregate(
