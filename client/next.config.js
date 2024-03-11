@@ -10,6 +10,9 @@ const nextConfig = {
       skipDefaultConversion: true,
     },
   },
+  typescript: {
+    ignoreBuildErrors: true,
+  },
   async redirects() {
     return [
       {

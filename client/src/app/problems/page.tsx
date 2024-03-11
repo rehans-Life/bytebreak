@@ -57,7 +57,7 @@ export default function Problems() {
   const router = useRouter();
   const user = useAtomValue(userAtom)
 
-  const page = searchParams.get("page") || 1;
+  const page = searchParams.get("page") || "1";
   const perPage = searchParams.get("perPage") || "5";
   const difficulty = searchParams.get("difficulty");
   const status = searchParams.get("status");
