@@ -25,7 +25,7 @@ interface IProblem {
   likes: number
   tags: Types.ObjectId[]
   solution: {
-    languageId: number,
+    languageId: number
     code: string
   }
   sampleTestCases: { input: string; output: string }[]
@@ -86,7 +86,7 @@ const ProblemConfigSchema = new Schema<ProblemConfig>({
         },
       },
     ],
-  }
+  },
 })
 
 const ProblemSchema = new Schema<IProblem>(
@@ -136,20 +136,20 @@ const ProblemSchema = new Schema<IProblem>(
       default: [],
     },
     totalTestcases: {
-        type: Number,
-        default: 0,
+      type: Number,
+      default: 0,
     },
     solution: {
       type: {
         languageId: {
-          type: Number, 
+          type: Number,
           ref: 'Tag',
-          required: [true, 'Solution must be written in a specific language']
+          required: [true, 'Solution must be written in a specific language'],
         },
-        code: { 
-          type: String,       
-          required: [true, 'The problem requires a solution']
-        }
+        code: {
+          type: String,
+          required: [true, 'The problem requires a solution'],
+        },
       },
       select: false,
     },

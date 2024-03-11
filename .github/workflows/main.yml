@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - "**"
+  pull_request:
+    branches:
+      - "**"
 
 jobs:
   build:
@@ -24,4 +27,4 @@ jobs:
         run: cd ..
 
       - name: Installing Packages And Linting in Server
-        run: cd server && npm install && npm run lint
+        run: cd server && npm install && npm run build

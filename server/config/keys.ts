@@ -8,7 +8,7 @@ export default {
   FRONTEND_URI: process.env.FRONTEND_URI,
   JUDGE0_API: process.env.JUDGE0_API,
   RAPID_API_HOST: process.env.RAPID_API_HOST,
-  RAPID_API_KEY: process.env.RAPID_API_KEY
+  RAPID_API_KEY: process.env.RAPID_API_KEY,
 } as {
   PORT: number | string
   NODE_ENV: 'Development' | 'Production' | 'CI'
@@ -17,7 +17,7 @@ export default {
   JWT_EXPIRES_IN: string
   JWT_COOKIE_EXPIRES_IN: string
   FRONTEND_URI: string
-  JUDGE0_API: string,
-  RAPID_API_HOST: string,
+  JUDGE0_API: string
+  RAPID_API_HOST: string
   RAPID_API_KEY: string
 }

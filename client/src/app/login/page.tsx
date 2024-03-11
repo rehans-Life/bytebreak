@@ -1,7 +1,7 @@
 'use client';
 
-import { IUser, googleUserAtom, userAtom } from '@/atoms/userAtom';
-import { getGoogleUser, login } from '@/utils/api';
+import { IUser, userAtom } from '@/atoms/userAtom';
+import { login } from '@/utils/api';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import { useSetAtom } from 'jotai';
@@ -13,11 +13,6 @@ import Loading from '../components/loading';
 import styles from '../styles';
 import Input from '../components/input';
 import Image from 'next/image';
-import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
-import { auth } from '../../../firebase';
-import { AxiosError } from 'axios';
-import { errorToast } from '@/toasts/errorToast';
-import { ApiErrorResponse } from '../interfaces';
 import GoogleButton from '../components/google-button';
 
 const LoginSchema = z.object({

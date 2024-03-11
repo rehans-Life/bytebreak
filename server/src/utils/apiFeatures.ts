@@ -11,9 +11,9 @@ export interface QueryObj {
 }
 
 export interface PaginateProbelmQuery {
-  page?: string,
-  limit?: string,
-  fields: string,
+  page?: string
+  limit?: string
+  fields: string
   filter: { [key: string]: any }
 }
 
@@ -23,25 +23,35 @@ class ApiFeatures {
     public queryObj: QueryObj,
   ) {}
 
-  static formatQuery: RequestHandler  = (req: Request, _, next: NextFunction) => {
-    let { page, limit, fields } = req.query;
-    const excludedFields = ["page", "limit", "fields"];
-  
-    if(fields) fields = fields.toString().replace(/\,/g, ' ');
-    else fields = "-__v";
-  
-    let filter = { ...req.query };
-    excludedFields.forEach((field) => delete filter[field]);
-    filter = JSON.parse(JSON.stringify(filter).replace(/\b(lt|gt|lte|gte|eq|ne|all|in|regex)\b/g, (match) => `$${match}`));
-    
+  static formatQuery: RequestHandler = (
+    req: Request,
+    _,
+    next: NextFunction,
+  ) => {
+    const { page, limit } = req.query
+    let { fields } = req.query
+    const excludedFields = ['page', 'limit', 'fields']
+
+    if (fields) fields = fields.toString().replace(/,/g, ' ')
+    else fields = '-__v'
+
+    let filter = { ...req.query }
+    excludedFields.forEach((field) => delete filter[field])
+    filter = JSON.parse(
+      JSON.stringify(filter).replace(
+        /\b(lt|gt|lte|gte|eq|ne|all|in|regex)\b/g,
+        (match) => `$${match}`,
+      ),
+    )
+
     req.query = {
       page,
       limit,
       fields,
-      filter
+      filter,
     }
 
-    next();
+    next()
   }
 
   filter() {
@@ -84,7 +94,7 @@ class ApiFeatures {
 
   select() {
     if (this.queryObj.fields) {
-      const fields = this.queryObj.fields.replace(/\,/g, ' ')
+      const fields = this.queryObj.fields.replace(/,/g, ' ')
       this.query = this.query.select(fields)
     } else {
       this.query = this.query.select('-__v')

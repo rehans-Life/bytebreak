@@ -22,7 +22,7 @@ export interface IUserMethods {
   ) => Promise<boolean>
 }
 
-type UserModel = Model<IUser, {}, IUserMethods>
+type UserModel = Model<IUser, object, IUserMethods>
 
 const UserSchema = new Schema<IUser, UserModel, IUserMethods>(
   {
@@ -47,7 +47,7 @@ const UserSchema = new Schema<IUser, UserModel, IUserMethods>(
     },
     userId: {
       type: String,
-      unqiue: true
+      unqiue: true,
     },
     active: {
       type: Boolean,

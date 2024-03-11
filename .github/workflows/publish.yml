@@ -1,0 +1,31 @@
+name: Publish To Docker
+
+on:
+  workflow_run:
+    workflows: [Linting And Testing]
+    types:
+      - completed
+    branches: [main]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - name: Checking out branch
+        uses: actions/checkout@v2
+
+      - name: "Build Images"
+        run: |
+          docker build -t rehanslife/byte-client ./client
+          docker build -t rehanslife/byte-server ./server
+          docker build -t rehanslife/byte-nginx ./nginx
+
+      - name: "Login Docker"
+        run: echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_ID }} --password-stdin
+
+      - name: "Push Images to Docker"
+        run: |
+          docker push rehanslife/byte-client
+          docker push rehanslife/byte-server
+          docker push rehanslife/byte-nginx

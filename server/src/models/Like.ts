@@ -1,12 +1,4 @@
-import mongoose, {
-  HydratedDocument,
-  Model,
-  Schema,
-  Types,
-  model,
-} from 'mongoose'
-import AppError from '../utils/appError'
-import capitalize from "capitalize";
+import { HydratedDocument, Model, Schema, Types, model } from 'mongoose'
 
 export interface ILike {
   parent: Types.ObjectId
@@ -23,7 +15,7 @@ export interface ILikeMethods {
   >
 }
 
-type ILikeModel = Model<ILike, {}, ILikeMethods>
+type ILikeModel = Model<ILike, object, ILikeMethods>
 
 const LikeSchema = new Schema<ILike, ILikeModel, ILikeMethods>(
   {
@@ -44,6 +36,6 @@ const LikeSchema = new Schema<ILike, ILikeModel, ILikeMethods>(
   },
 )
 
-LikeSchema.index({ parent: 1, user: 1 }, { unique: true });
+LikeSchema.index({ parent: 1, user: 1 }, { unique: true })
 
 export default model<ILike, ILikeModel>('Like', LikeSchema)

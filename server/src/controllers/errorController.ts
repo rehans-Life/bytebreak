@@ -21,13 +21,13 @@ class MongooseCastError implements CastError {
 }
 
 function handleValidationError(error: MongooseError) {
-  const errorMsg = `${Object.values((error as any).errors).reduce((acc: string, curr: any) => !acc.length ? curr.message : `${acc}, ${curr.message}` ,"")}.`;
+  const errorMsg = `${Object.values((error as any).errors).reduce((acc: string, curr: any) => (!acc.length ? curr.message : `${acc}, ${curr.message}`), '')}.`
 
   return new AppError(errorMsg, 400)
 }
 
 function handleDuplicateKeyError(error: MongoServerError) {
-  const field = error.message.match(/(?<=\{\s).*(?=\:)/)?.[0]
+  const field = error.message.match(/(?<=\{\s).*(?=:)/)?.[0]
   const value = error.message
     .match(new RegExp('(?<=' + field + ':)((.|d)*)(?=})'))?.[0]
     .trim()
@@ -59,7 +59,7 @@ function handleJWTMalformedError() {
 
 function handleZodError(error: ZodError) {
   return new AppError(
-    error.errors.reduce((acc, curr, i) => {
+    error.errors.reduce((acc, curr) => {
       const message = `${curr.path[curr.path.length - 1]}: ${curr.message};`
       return `${acc} ${message}`
     }, ''),
@@ -109,7 +109,7 @@ export default (error: Error, req: Request, res: Response, _: NextFunction) => {
 
   if (error instanceof MongooseCastError && error.name === 'CastError')
     appError = buildCastError(error)
-  if (error.name === 'ValidationError') appError = handleValidationError(error);
+  if (error.name === 'ValidationError') appError = handleValidationError(error)
   if (error instanceof MongoServerError && error.code === 11000)
     appError = handleDuplicateKeyError(error)
   if (error.name === 'JsonWebTokenError') appError = handleJWTMalformedError()

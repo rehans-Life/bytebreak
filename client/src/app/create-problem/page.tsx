@@ -1,6 +1,5 @@
 'use client'
 
-import { Option } from '../components/select'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
   Controller,
@@ -30,6 +29,7 @@ import { LangConfig, codesAtom, setRestrictedLines } from '@/atoms/codeEditorAto
 import { userAtom } from '@/atoms/userAtom'
 import { showSignInToast } from '@/toasts/signInReminder'
 import generateCodeConfig from '@/utils/generateCodeConfig'
+import { difficulties } from '@/data/input-data'
 
 const MarkdownEditor = dynamic(
   () => import("@uiw/react-markdown-editor").then((mod) => mod.default),
@@ -40,24 +40,6 @@ const MarkdownEditor = dynamic(
     },
   }
 );
-
-export const difficulties: Option<string>[] = [
-  {
-    value: 'easy',
-    label: 'Easy',
-    color: 'rgb(0, 184, 163)',
-  },
-  {
-    value: 'medium',
-    label: 'Medium',
-    color: 'rgb(255 161 22)',
-  },
-  {
-    value: 'hard',
-    label: 'Hard',
-    color: 'rgb(255 55 95)',
-  },
-]
 
 const descDefaultMarkup =
   'Give a brief description of the question and all the ``parameters`` that are going to be *passed* into the ``code`` that *the user submits*.\n\n**Example 1:**\n> **Input: input1=[12, 23, 23], input2= 32**\\\n> **Ouput: [0, 1]**\\\n> **Explanation: Explain how the ouput was acheived with the given input**\n\n**Contraints:**\n- ``some contraints related to the input.``\n- ``some constraints related to the output.``\n\n\n**Follow-up:** Challenge the user to present a solution with a better `space and time complexity`.'

@@ -1,13 +1,13 @@
 import { Schema, Types, model } from 'mongoose'
-import z from 'zod';
+import z from 'zod'
 
 export const testcaseSchema = z.object({
-    output: z.string(),
-    input: z.string(),
-});
+  output: z.string(),
+  input: z.string(),
+})
 
 const testCasesDBSchema = testcaseSchema.extend({
-  problem: z.instanceof(Types.ObjectId)
+  problem: z.instanceof(Types.ObjectId),
 })
 
 export type ITestCase = z.infer<typeof testCasesDBSchema>

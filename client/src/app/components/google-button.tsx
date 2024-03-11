@@ -10,7 +10,7 @@ import { errorToast } from '@/toasts/errorToast';
 import { AxiosError } from 'axios';
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { auth } from '../../../firebase';
-import { userAtom } from '../../atoms/userAtom';
+import { userAtom } from '@/atoms/userAtom';
 import defaultPhoto from '@/utils/defaultPhoto';
 
 export default function GoogleButton() {

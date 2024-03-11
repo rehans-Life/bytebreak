@@ -4,11 +4,11 @@ import { getProblems, getTags } from '@/utils/api';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import Table, { Header as HeaderType } from '../components/table';
+import Table from '../components/table';
 import TooltipContainer from '../components/tooltip';
 import capitalize from 'capitalize';
 import Select, { Option } from '../components/select';
-import { difficulties } from '../create-problem/page';
+import { difficulties, headers, perPages, statuses } from '@/data/input-data';
 import { FaRadiationAlt } from '@react-icons/all-files/fa/FaRadiationAlt';
 import { FiCheckCircle } from '@react-icons/all-files/fi/FiCheckCircle';
 import { FiSearch } from '@react-icons/all-files/fi/FiSearch';
@@ -21,64 +21,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useAtomValue } from 'jotai';
 import { userAtom } from '@/atoms/userAtom';
 import { SubProblem } from '../create-problem/interfaces';
-
-const headers: HeaderType[] = [
-  {
-    label: "Status",
-    name: "status",
-    width: 60
-  },
-  {
-    label: "Name",
-    name: "name",
-    width: 250
-  },
-  {
-    label: "Accceptance",
-    name: "accceptanceRate",
-    width: 100
-  },
-  {
-    label: "Difficulty",
-    name: "name",
-    width: 100
-  },
-  {
-    label: "Likes",
-    name: "likes",
-    width: 100
-  },
-]
-
-const perPages: Option<number>[] = [
-  {
-    label: "5 / page",
-    value: 5
-  },
-  {
-    label: "10 / page",
-    value: 10
-  },
-  {
-    label: "15 / page",
-    value: 15
-  }
-]
-
-const statuses: Option<string>[] = [
-  {
-    label: "Solved",
-    value: "solved"
-  },
-  {
-    label: "Attempted",
-    value: "attempted"
-  },
-  {
-    label: "Todo",
-    value: "todo"
-  }
-]
 
 const RowSkeleton = () => {
   return <tr className='text-sm h-11' >

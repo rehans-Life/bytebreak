@@ -3,29 +3,29 @@ import Problem from './Problem'
 import AppError from '../utils/appError'
 
 export const statuses = [
-  "Accepted",
-  "Wrong Answer",
-  "Time Limit Exceeded",
-  "Compilation Error",
-  "Runtime Error (SIGSEGV)",
-  "Runtime Error (SIGXFSZ)",
-  "Runtime Error (SIGFPE)",
-  "Runtime Error (SIGABRT)",
-  "Runtime Error (NZEC)",
-  "Runtime Error (Other)",
-  "Internal Error",
-  "Exec Format Error"
-] as const;
+  'Accepted',
+  'Wrong Answer',
+  'Time Limit Exceeded',
+  'Compilation Error',
+  'Runtime Error (SIGSEGV)',
+  'Runtime Error (SIGXFSZ)',
+  'Runtime Error (SIGFPE)',
+  'Runtime Error (SIGABRT)',
+  'Runtime Error (NZEC)',
+  'Runtime Error (Other)',
+  'Internal Error',
+  'Exec Format Error',
+] as const
 
-export type StatusTypes = typeof statuses[number]
+export type StatusTypes = (typeof statuses)[number]
 
 interface ISubmission {
   problem: Types.ObjectId
   user: Types.ObjectId
   language: number
   code: string
-  runtime: String
-  memory: String
+  runtime: string
+  memory: string
   status: StatusTypes
   testCasesPassed: number
   lastExecutedTestcase?: Types.ObjectId
@@ -37,21 +37,21 @@ const SubmissionSchema = new Schema<ISubmission>(
     problem: {
       type: Schema.Types.ObjectId,
       ref: 'Problem',
-      required: [true, 'a submission should correspond to a problem']
+      required: [true, 'a submission should correspond to a problem'],
     },
     user: {
       type: Schema.Types.ObjectId,
       ref: 'User',
-      required: [true, 'a submission should correspond to a user']
+      required: [true, 'a submission should correspond to a user'],
     },
     language: {
       type: Number,
       ref: 'Tag',
-      required: [true, 'a submission should be written in a specific language']
+      required: [true, 'a submission should be written in a specific language'],
     },
     lastExecutedTestcase: {
       type: Schema.Types.ObjectId,
-      ref: "TestCase"
+      ref: 'TestCase',
     },
     code: {
       type: String,
@@ -59,16 +59,19 @@ const SubmissionSchema = new Schema<ISubmission>(
     },
     status: {
       type: String,
-      enum: { values: statuses, message: "{VALUE} is not a valid status for a submission" },
+      enum: {
+        values: statuses,
+        message: '{VALUE} is not a valid status for a submission',
+      },
       required: [true, 'status code is required for a submission'],
     },
     runtime: {
       type: String,
-      default: 'N/A'
+      default: 'N/A',
     },
     memory: {
       type: String,
-      default: 'N/A'
+      default: 'N/A',
     },
     testCasesPassed: {
       type: Number,

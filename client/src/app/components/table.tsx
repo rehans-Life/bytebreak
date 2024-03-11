@@ -2,6 +2,7 @@ import React, { ReactElement, useEffect, useMemo, useRef } from 'react'
 import { IoChevronDownOutline } from '@react-icons/all-files/io5/IoChevronDownOutline'
 import { atom, useAtom, useSetAtom } from 'jotai'
 import { IoCheckmark } from '@react-icons/all-files/io5/IoCheckmark'
+import Image from 'next/image'
 
 export interface Header<Value = any, Field = any> {
     label: string,
@@ -187,7 +188,7 @@ export default function Table<T, V = any, F = any>({
                         <tr className='!bg-transparent'>
                             <td colSpan={100}>
                                 <div className='w-full flex flex-col items-center gap-y-4'>
-                                    <img src="/null.png" alt="null" className='w-44 h-44' />
+                                    <Image width={1080} height={1080} src="/null.png" alt="null" className='w-44 h-44' />
                                     <span className='font-medium text-dark-gray-6'>{emptyMsg || "No Data"}</span>
                                 </div>
                             </td>

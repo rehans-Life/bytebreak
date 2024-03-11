@@ -7,8 +7,6 @@ import { Provider as JotaiProvider } from 'jotai'
 import { ThemeProvider } from '@/providers/themeProvider'
 import Header from './components/header'
 import { Suspense } from 'react'
-import { getMe } from '@/utils/api'
-import { cookies } from 'next/headers'
 import Image from 'next/image'
 
 export const metadata: Metadata = {

@@ -1,4 +1,4 @@
-import { Schema, Types, model, HydratedDocument } from 'mongoose'
+import { Schema, Types, model } from 'mongoose'
 import Problem from './Problem'
 
 export interface IComment {
@@ -13,7 +13,7 @@ export interface IComment {
 }
 
 function isInstanceOfComment(obj: any): obj is IComment {
-  return ('parentId' in obj && 'user' in obj && 'text' in obj)
+  return 'parentId' in obj && 'user' in obj && 'text' in obj
 }
 
 const CommentSchema = new Schema<IComment>(
@@ -31,11 +31,12 @@ const CommentSchema = new Schema<IComment>(
       type: String,
       validate: {
         validator: async function (value: string): Promise<boolean> {
-          if(!isInstanceOfComment(this)) return false;
+          if (!isInstanceOfComment(this)) return false
 
           const parent = await Problem.findById(this.parentId)
 
-          if (parent && this.user !== parent.user && !value && !value.length) return false
+          if (parent && this.user !== parent.user && !value && !value.length)
+            return false
           return true
         },
         message: '{PATH} is required for a solution',
