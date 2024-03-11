@@ -37,7 +37,7 @@ export function SectionHeader({
 export function SectionBody({
     children
 }: { children: ReactNode }) {
-    return children
+    return <>{ children }</>
 }
 
 export function SectionFooter({

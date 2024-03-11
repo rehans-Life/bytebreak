@@ -28,7 +28,7 @@ export default function Header() {
         mutationFn: logout
     });
 
-    return (!pathname.match(new RegExp(/\/problems\/.+/)) &&
+    return (!pathname.match(new RegExp(/\/problems\/.+/)) ?
         <div className='md:px-5 sm:py-0 py-3 px-3 relative bg-dark-layer-3 border-b border-dark-border flex flex-col gap-y-2 sm:flex-row items-center justify-between'>
             <div className="flex items-center gap-x-7 text-white">
                 <Link href={'/'}>
@@ -68,5 +68,5 @@ export default function Header() {
                 }
             </div>
         </div>
-    )
+    : <></>) 
 }

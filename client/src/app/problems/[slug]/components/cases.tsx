@@ -10,7 +10,7 @@ export default function Cases({
   onClick: (index: number) => void,
   onClose?: (index: number) => void
 }) {
-  return (
+  return <>{
     Array(length).fill(0).map((_, i) =>
       <div
         key={i}
@@ -28,5 +28,6 @@ export default function Cases({
           </div>
         }
       </div>
-    ))
+    )}
+    </>
 }
