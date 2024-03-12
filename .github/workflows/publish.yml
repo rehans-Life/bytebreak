@@ -9,6 +9,7 @@ on:
 
 jobs:
   publish:
+    environment: Deployment
     runs-on: ubuntu-latest
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
