@@ -17,7 +17,7 @@ jobs:
 
       - name: "Build Images"
         run: |
-          docker build --build-arg NEXT_PUBLIC_API_KEY=${{ secrets.NEXT_PUBLIC_API_KEY }} --build-arg NEXT_PUBLIC_AUTH_DOMAIN=${{ secrets.NEXT_PUBLIC_AUTH_DOMAIN }}  -t rehanslife/byte-client ./client
+          # docker build --build-arg NEXT_PUBLIC_API_KEY=${{ secrets.NEXT_PUBLIC_API_KEY }} --build-arg NEXT_PUBLIC_AUTH_DOMAIN=${{ secrets.NEXT_PUBLIC_AUTH_DOMAIN }}  -t rehanslife/byte-client ./client
           docker build -t rehanslife/byte-server ./server
           docker build -t rehanslife/byte-nginx ./nginx
 
@@ -26,6 +26,6 @@ jobs:
 
       - name: "Push Images to Docker"
         run: |
-          docker push rehanslife/byte-client
+          # docker push rehanslife/byte-client
           docker push rehanslife/byte-server
           docker push rehanslife/byte-nginx
