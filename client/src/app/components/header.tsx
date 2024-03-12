@@ -43,7 +43,7 @@ export default function Header() {
             </div>
             <div className="flex items-center gap-x-4">
                 {
-                    user
+                    typeof user !== 'undefined'
                         ? <>
                             <Link href={`/${user?.username}`}>
                                 <Image height={500} width={500} src={user.photo || defaultPhoto} alt="profile-photo" className="w-6 h-6 object-contain cursor-pointer rounded-full" />

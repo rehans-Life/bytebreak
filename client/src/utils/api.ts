@@ -1,5 +1,13 @@
-import { MutationFunction, QueryFunction } from '@tanstack/react-query'
-import { Problem, SubProblem } from '../app/create-problem/interfaces'
+import {
+  MutateFunction,
+  MutationFunction,
+  QueryFunction,
+} from '@tanstack/react-query'
+import {
+  Problem,
+  ProblemType,
+  SubProblem,
+} from '../app/create-problem/interfaces'
 import {
   ApiSuccessResponse,
   RunVarType,
@@ -203,9 +211,27 @@ export const getTags: QueryFunction<Tag[]> = async ({
   queryKey: [, category],
 }) => {
   const { data: res } = await axios.get<ApiSuccessResponse<Tag[]>>(
-    `/api/v1/general/tags?category=${category}`
+    `/api/v1/general/tags${category ? `?category=${category}` : ''}`
   )
   return res.data
+}
+
+export const createProblem: MutateFunction<
+  { problem: Problem; editorial: Comment },
+  Error,
+  ProblemType
+> = async (problem) => {
+  const formData = createFormData(problem)
+  const {
+    data: { data },
+  } = await axios.post<
+    ApiSuccessResponse<{ problem: Problem; editorial: Comment }>
+  >('/api/v1/problems', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  })
+  return data
 }
 
 export const getUserCalender: QueryFunction<UserCalender> = async ({

@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import React, { ReactNode, Suspense } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 import FallbackError from '@/app/components/error';

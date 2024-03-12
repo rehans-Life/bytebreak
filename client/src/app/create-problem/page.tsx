@@ -15,23 +15,22 @@ import { ProblemSchema } from './schemas'
 import { useAtomValue, useSetAtom } from 'jotai'
 import { languagesAtom, tagsAtom, topicsAtom } from '../../atoms/tagAtoms'
 import { useMutation, useSuspenseQuery, useQueryClient, } from '@tanstack/react-query'
-import axios from '../../utils/axios'
-import { ApiSuccessResponse, Comment, LanguageTag, TopicTag } from '../interfaces'
-import createFormData from '@/utils/createFormData'
+import { Comment, LanguageTag, TopicTag } from '../interfaces'
 import DefaultForm from '@/app/components/defaultForm'
 import { AxiosError } from 'axios'
 import { useRouter } from 'next/navigation'
-import '@uiw/react-markdown-editor/markdown-editor.css';
-import '@uiw/react-markdown-preview/markdown.css';
-import dynamic from 'next/dynamic'
+import dynamicImport  from 'next/dynamic'
 import MarkdownSkeleton from '../../skeletons/markdown-skeleton'
 import { LangConfig, codesAtom, setRestrictedLines } from '@/atoms/codeEditorAtoms'
 import { userAtom } from '@/atoms/userAtom'
 import { showSignInToast } from '@/toasts/signInReminder'
 import generateCodeConfig from '@/utils/generateCodeConfig'
 import { difficulties } from '@/data/input-data'
+import '@uiw/react-markdown-editor/markdown-editor.css';
+import '@uiw/react-markdown-preview/markdown.css';
+import { createProblem, getTags } from '@/utils/api'
 
-const MarkdownEditor = dynamic(
+const MarkdownEditor = dynamicImport(
   () => import("@uiw/react-markdown-editor").then((mod) => mod.default),
   {
     ssr: false,
@@ -77,12 +76,7 @@ export default function Create() {
         setTags(data)
       }
     },
-    queryFn: async function () {
-      const { data: res } = await axios.get<ApiSuccessResponse<(LanguageTag | TopicTag)[]>>(
-        '/api/v1/general/tags'
-      )
-      return res.data
-    },
+    queryFn: getTags,
   })
 
   const { mutate, isPending } = useMutation<{ problem: Problem, editorial: Comment }, AxiosError, ProblemType>({
@@ -91,19 +85,7 @@ export default function Create() {
         errorMsg: 'An Error occured while creating the problem please try again later'
       }
     },
-    mutationFn: async function (problem) {
-      const formData = createFormData(problem)
-      const { data: { data } } = await axios.post<ApiSuccessResponse<{ problem: Problem, editorial: Comment }>>(
-        '/api/v1/problems',
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        }
-      )
-      return data
-    },
+    mutationFn: createProblem,
     onSuccess(data) {
       queryClient.setQueryData(['problems', data.problem.slug], data.problem)
       queryClient.setQueryData(['editorial', data.problem.slug], data.editorial)

@@ -213,7 +213,7 @@ export default function Header() {
                     </DialogContent>
                 </Dialog>
                 <div>
-                    {user
+                    {typeof user !== 'undefined'
                         ? <Link href={`/${user.username}`}>
                             <Image width={500} height={500} className='h-5 w-5 rounded-full cursor-pointer' src={user.photo || "/default.png"} alt="Profile Photo" />
                         </Link>
