@@ -1,9 +1,11 @@
 import dynamic from 'next/dynamic';
-import React, { useMemo, useRef, useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { ICommand, commands } from '@uiw/react-md-editor';
 import { IoCodeSlashOutline } from "@react-icons/all-files/io5/IoCodeSlashOutline";
 import { IoLink } from "@react-icons/all-files/io5/IoLink";
 import styles from '../styles';
+import '@uiw/react-markdown-editor/markdown-editor.css';
+import '@uiw/react-markdown-preview/markdown.css';
 
 const code: ICommand = {
     name: 'code',
@@ -34,21 +36,6 @@ const link: ICommand = {
         api.replaceSelection(state.text + "[title](url)");
     },
 };
-
-const tag: ICommand = {
-    name: '@',
-    keyCommand: '@',
-    buttonProps: { 'aria-label': 'Insert Reference' },
-    icon: (
-        <div className='rounded-md hover:bg-dark-fill-2 py-1.5 px-1.5'>
-            <IoLink className="text-dark-gray-6" />
-        </div>
-    ),
-    execute: (state, api) => {
-        api.textArea.value = state.text + "``";
-    },
-};
-
 
 const MDEditor = dynamic(
     () => import("@uiw/react-md-editor"),

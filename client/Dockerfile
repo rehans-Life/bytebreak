@@ -1,4 +1,4 @@
-FROM node:21-bookworm
+FROM node:18-alpine as builder
 
 WORKDIR /usr/app
 

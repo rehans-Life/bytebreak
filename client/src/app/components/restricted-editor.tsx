@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { editor } from 'monaco-editor'
-import { Editor as MonacoEditor, OnMount, } from '@monaco-editor/react'
+import { Editor as MonacoEditor, OnMount } from '@monaco-editor/react'
 
 export default function RestrictedEditor({
     value,

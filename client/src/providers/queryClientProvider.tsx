@@ -31,7 +31,8 @@ export default function Provider({
   )
 
   return (
-    <QueryClientProvider client={queryClient}>{children}
+    <QueryClientProvider client={queryClient}>
+      {children}
     </QueryClientProvider>
   )
 }

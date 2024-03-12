@@ -1,9 +1,18 @@
 import React from 'react'
-import 'chart.js/auto';
-import { Doughnut } from 'react-chartjs-2'
-import { Chart as ChartJS, LineController, LineElement, PointElement, LinearScale, Title, ChartData } from 'chart.js';
+import dynamic from 'next/dynamic';
+import { ChartData } from 'chart.js';
 
-ChartJS.register(LineController, LineElement, PointElement, LinearScale, Title);
+const Doughnut = dynamic(
+    () => import("react-chartjs-2").then(async (mod) => {
+        await import('chart.js/auto')
+        return mod.Doughnut
+    }),
+    { ssr: false, 
+      loading() {
+        return <div className='w-[110px] h-[110px] rounded-full'></div>
+    }, }
+  );
+  
 
 export default function RadialChart({
     solved,
