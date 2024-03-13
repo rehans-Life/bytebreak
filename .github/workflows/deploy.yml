@@ -1,0 +1,51 @@
+name: Deploy to Gloud
+
+on:
+  workflow_run:
+    workflows: ['Publish To Docker']
+    types:
+      - completed
+    branch: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    environment: Deployment
+
+    steps:
+      - name: checkout repo
+        uses: actions/checkout@v2
+
+      - name: install gloud
+        uses: google-github-actions/setup-glcoud@v0
+        with:
+          project_id: ${{ secrets.PROJECT_ID }}
+          service_account_key: ${{ secrets.SERVICE_ACCOUNT_KEY }}
+          export_default_crendentials: true
+
+      - name: Access gcloud CLI
+        run: |
+          gcloud auth configure-docker
+
+      - name: SCP into GCP instance to transfer docker compose file
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.VM_INSTANCE_IP }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "docker-compose.yml"
+          target: "/home/${{ secrets.SSH_USERNAME }}/"
+
+      - name: SHH into GCP instance to run docker compose file
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.VM_INSTANCE_IP }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            docker compose -f /home/${{ secrets.SSH_USERNAME }}/docker-compose.yml down
+            docker compose -f /home/${{ secrets.SSH_USERNAME }}/docker-compose.yml build --pull
+            docker compose -f /home/${{ secrets.SSH_USERNAME }}/docker-compose.yml up -d
+            docker image prune -f

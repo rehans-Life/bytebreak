@@ -1,14 +1,12 @@
 version: '3'
 
-include: 
-   - ./judge0/docker-compose.yml 
+include:
+  - ./judge0/docker-compose.yml
 
 services:
   nginx:
     restart: always
-    build:
-      context: ./nginx
-      dockerfile: Dockerfile
+    image: rehanslife/byte-nginx
     ports:
       - '8080:80'
   client:
@@ -17,14 +15,10 @@ services:
       - FIREBASE_STORAGE_URI=$FIREBASE_STORAGE_URI
       - NEXT_PUBLIC_AUTH_DOMAIN=$NEXT_PUBLIC_AUTH_DOMAIN
       - NEXT_PUBLIC_API_KEY=$NEXT_PUBLIC_API_KEY
-    build:
-      context: ./client
-      dockerfile: Dockerfile
+    image: rehanslife/byte-client
   api:
     restart: always
-    build:
-      context: ./server
-      dockerfile: Dockerfile
+    image: rehanslife/byte-server
     environment:
       - PORT=4000
       - DP_PASSWORD=$DP_PASSWORD
