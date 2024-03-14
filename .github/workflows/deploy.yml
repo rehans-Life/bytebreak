@@ -57,6 +57,6 @@ jobs:
           envs: PORT,DP_PASSWORD,DB_URI,JWT_SECRET_KEY,JWT_EXPIRES_IN,JWT_COOKIE_EXPIRES_IN,FIREBASE_STORAGE_URI,FRONTEND_URI,JUDGE0_API
           script: |
             docker compose -f /home/${{ secrets.SSH_USERNAME }}/docker-compose.yml down
+            docker system prune -f
             docker compose -f /home/${{ secrets.SSH_USERNAME }}/docker-compose.yml build --pull
             docker compose -f /home/${{ secrets.SSH_USERNAME }}/docker-compose.yml up -d
-            docker image prune -f
