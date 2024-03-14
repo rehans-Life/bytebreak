@@ -3,29 +3,39 @@ version: '3'
 include:
   - ./judge0/docker-compose.yml
 
+secrets:
+  DP_PASSWORD:
+    environment: 'DP_PASSWORD'
+  DB_URI:
+    environment: 'DB_URI'
+  JWT_SECRET_KEY:
+    environment: 'JWT_SECRET_KEY'
+  JWT_EXPIRES_IN:
+    environment: 'JWT_EXPIRES_IN'
+  JWT_COOKIE_EXPIRES_IN:
+    environment: 'JWT_COOKIE_EXPIRES_IN'
+
 services:
   nginx:
     restart: always
     image: rehanslife/byte-nginx
     ports:
       - '8080:80'
+
   client:
     restart: always
-    environment:
-      - FIREBASE_STORAGE_URI=$FIREBASE_STORAGE_URI
-      - NEXT_PUBLIC_AUTH_DOMAIN=$NEXT_PUBLIC_AUTH_DOMAIN
-      - NEXT_PUBLIC_API_KEY=$NEXT_PUBLIC_API_KEY
     image: rehanslife/byte-client
+
   api:
     restart: always
     image: rehanslife/byte-server
     environment:
-      - PORT=4000
-      - DP_PASSWORD=$DP_PASSWORD
-      - DB_URI=$DP_URI
-      - JWT_SECRET_KEY=$JWT_SECRET_KEY
-      - JWT_EXPIRES_IN=$JWT_EXPIRES_IN
-      - JWT_COOKIE_EXPIRES_IN=$JWT_COOKIE_EXPIRES_IN
-      - FIREBASE_STORAGE_URI=$FIREBASE_STORAGE_URI
-      - FRONTEND_URI=$FRONTEND_URI
-      - JUDGE0_API=$JUDGE0_API
+      PORT: ${PORT}
+      DP_PASSWORD: /run/secrets/DP_PASSWORD
+      DB_URI: /run/secrets/DB_URI
+      JWT_SECRET_KEY: /run/secrets/JWT_SECRET_KEY
+      JWT_EXPIRES_IN: /run/secrets/JWT_EXPIRES_IN
+      JWT_COOKIE_EXPIRES_IN: /run/secrets/JWT_COOKIE_EXPIRES_IN
+      FIREBASE_STORAGE_URI: ${FIREBASE_STORAGE_URI}
+      FRONTEND_URI: ${FRONTEND_URI}
+      JUDGE0_API: ${JUDGE0_API}

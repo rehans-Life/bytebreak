@@ -13,12 +13,11 @@ jobs:
 
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     environment: Deployment
-
     steps:
       - name: checkout repo
         uses: actions/checkout@v2
 
-      - name: install gloud
+      - name: install gcloud
         uses: google-github-actions/setup-gcloud@v0.3.0
         with:
           project_id: ${{ secrets.PROJECT_ID }}
@@ -35,15 +34,25 @@ jobs:
           host: ${{ secrets.VM_INSTANCE_IP }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "docker-compose.yml"
+          source: "docker-compose.yml,./judge0/docker-compose.yml,./judge0/judge0.conf"
           target: "/home/${{ secrets.SSH_USERNAME }}/"
 
-      - name: SHH into GCP instance to run docker compose file
+      - name: SSH into GCP instance to run docker compose file
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.VM_INSTANCE_IP }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          env:
+            PORT: ${{ secrets.PORT }}
+            DP_PASSWORD: ${{secrets.DP_PASSWORD}}
+            DB_URI: ${{ secrets.DB_URI }}
+            JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
+            JWT_EXPIRES_IN: ${{ secrets.JWT_EXPIRES_IN }}
+            JWT_COOKIE_EXPIRES_IN: ${{ secrets.JWT_COOKIE_EXPIRES_IN }}
+            FIREBASE_STORAGE_URI: ${{ secrets.FIREBASE_STORAGE_URI }}
+            FRONTEND_URI: ${{ secrets.FRONTEND_URI }}
+            JUDGE0_API: ${{ secrets.JUDGE0_API }}
           script: |
             docker compose -f /home/${{ secrets.SSH_USERNAME }}/docker-compose.yml down
             docker compose -f /home/${{ secrets.SSH_USERNAME }}/docker-compose.yml build --pull
