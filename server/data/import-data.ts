@@ -27,22 +27,24 @@ async function deleteData() {
 
 const exec = async () => {
   try {
+    const DB_URI = process.env.DB_URI
+
     await mongoose.connect(
-      process.env.DB_URI?.replace(
-        '<password>',
-        process.env.DB_PASSWORD || '',
-      ) || '',
+      DB_URI?.replace('<password>', process.env.DB_PASSWORD || '') || '',
     )
 
     if (process.argv[2] === '--import') {
       await importData()
+      process.exit(0)
     }
 
     if (process.argv[2] === '--delete') {
       await deleteData()
+      process.exit(0)
     }
   } catch (err) {
     console.log(err)
+    process.exit(1)
   }
 }
 exec()
