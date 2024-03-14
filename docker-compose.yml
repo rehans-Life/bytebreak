@@ -17,12 +17,17 @@ secrets:
 
 services:
   nginx:
+    depends_on:
+      - api
+      - client
     restart: always
     image: rehanslife/byte-nginx
     ports:
       - '8080:80'
 
   client:
+    depends_on:
+      - api
     restart: always
     image: rehanslife/byte-client
 
