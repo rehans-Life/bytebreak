@@ -10,6 +10,7 @@ const nextConfig = {
       skipDefaultConversion: true,
     },
   },
+  output: 'standalone',
   typescript: {
     ignoreBuildErrors: true,
   },

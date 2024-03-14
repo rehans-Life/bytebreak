@@ -16,4 +16,12 @@ COPY . .
 
 RUN npm run build
 
-CMD [ "npm", "run", "start" ]
+FROM gcr.io/distroless/nodejs20-debian11
+
+WORKDIR /usr/app
+
+COPY --from=builder /usr/app/.next/standalone ./
+COPY --from=builder /usr/app/public ./public
+COPY --from=builder /usr/app/.next/static ./.next/static
+
+CMD [ "server.js" ]

@@ -1,2 +1,5 @@
 node_modules
 .env.local
+.next
+README.node_modules
+npm-debug.log
