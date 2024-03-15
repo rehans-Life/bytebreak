@@ -1,8 +1,5 @@
 version: '3'
 
-include:
-  - ./judge0/docker-compose.yml
-
 secrets:
   DP_PASSWORD:
     environment: 'DP_PASSWORD'
@@ -23,7 +20,7 @@ services:
     restart: always
     image: rehanslife/byte-nginx
     ports:
-      - '8080:80'
+      - '80:80'
 
   client:
     depends_on:
