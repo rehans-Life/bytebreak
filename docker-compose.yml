@@ -1,5 +1,8 @@
 version: '3'
 
+include:
+  - ./judge0/docker-compose.yml
+
 secrets:
   DP_PASSWORD:
     environment: 'DP_PASSWORD'
