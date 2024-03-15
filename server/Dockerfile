@@ -1,4 +1,4 @@
-FROM node:20-alpine as builder
+FROM node:20 as builder
 
 WORKDIR /usr/app
 
@@ -10,7 +10,7 @@ COPY . .
 
 RUN npx tsc
 
-FROM gcr.io/distroless/nodejs20-debian11
+FROM gcr.io/distroless/nodejs20-debian12
 
 WORKDIR /usr/app
 
