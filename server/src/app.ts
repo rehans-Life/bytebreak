@@ -33,7 +33,7 @@ app.use('/api/v1/general', generalRoutes)
 app.use('/api/v1/problems', problemRoutes)
 app.use('/api/v1/submissions', submissionRoutes)
 
-app.use('*', (req, res, next) => {
+app.use('*', (req, _, next) => {
   return next(new AppError(`Route ${req.path} not found on the server`, 404))
 })
 

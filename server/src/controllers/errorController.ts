@@ -26,7 +26,7 @@ function handleValidationError(error: MongooseError) {
   return new AppError(errorMsg, 400)
 }
 
-function handleDuplicateKeyError(error: MongoServerError) {
+function handleDuplicateKeyError(error: Error) {
   const field = error.message.match(/(?<=\{\s).*(?=:)/)?.[0]
   const value = error.message
     .match(new RegExp('(?<=' + field + ':)((.|d)*)(?=})'))?.[0]
@@ -110,7 +110,7 @@ export default (error: Error, req: Request, res: Response, _: NextFunction) => {
   if (error instanceof MongooseCastError && error.name === 'CastError')
     appError = buildCastError(error)
   if (error.name === 'ValidationError') appError = handleValidationError(error)
-  if (error instanceof MongoServerError && error.code === 11000)
+  if ('code' in error && error.code === 11000)
     appError = handleDuplicateKeyError(error)
   if (error.name === 'JsonWebTokenError') appError = handleJWTMalformedError()
   if (error.name === 'TokenExpiredError') appError = handleExipredTokenError()
