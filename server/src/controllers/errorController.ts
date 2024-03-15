@@ -1,7 +1,6 @@
 import { Response, Request, NextFunction } from 'express'
 import keys from '../../config/keys'
 import AppError from '../utils/appError'
-import { MongoServerError } from 'mongodb'
 import { CastError, MongooseError } from 'mongoose'
 import { ZodError } from 'zod'
 

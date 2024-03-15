@@ -47,7 +47,6 @@ const UserSchema = new Schema<IUser, UserModel, IUserMethods>(
     },
     userId: {
       type: String,
-      unqiue: true,
     },
     active: {
       type: Boolean,
