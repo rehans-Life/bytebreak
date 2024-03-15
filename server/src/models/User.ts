@@ -33,6 +33,12 @@ const UserSchema = new Schema<IUser, UserModel, IUserMethods>(
       required: [true, 'Username is required for creating an account'],
       minlength: [2, 'Username should be of atleast two characters'],
       maxlength: [30, 'Username should not be of more than 30 characters'],
+      validate: {
+        validator: (value: string) => {
+          return !value.match(/[^_a-z1-9-]/gi)
+        },
+        message: 'The username must contain only letters, numbers, hyphens and underscores'
+      },
     },
     email: {
       type: String,

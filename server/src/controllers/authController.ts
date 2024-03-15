@@ -105,15 +105,6 @@ export const signup: RequestHandler = catchAsync(async (req, res, next) => {
   delete req.body.role
   delete req.body.active
 
-  const reg = new RegExp(/[^_a-z1-9-]/gi)
-
-  if (req.body.username?.match(reg)) {
-    throw new AppError(
-      'The username must contain only letters, numbers, hyphens and underscores',
-      401,
-    )
-  }
-
   const user = await User.create(req.body)
   createSendToken(user, 201, res)
 })
