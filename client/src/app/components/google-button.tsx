@@ -8,10 +8,11 @@ import { useRouter } from 'next/navigation';
 import { useSetAtom } from 'jotai';
 import { errorToast } from '@/toasts/errorToast';
 import { AxiosError } from 'axios';
-import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { GoogleAuthProvider, UserCredential, signInWithPopup } from 'firebase/auth';
 import { auth } from '../../../firebase';
 import { userAtom } from '@/atoms/userAtom';
 import defaultPhoto from '@/utils/defaultPhoto';
+import { FirebaseError } from 'firebase/app';
 
 export default function GoogleButton() {
     const router = useRouter();
@@ -39,16 +40,26 @@ export default function GoogleButton() {
                 errorMsg: "An Error Occured while performing google auth please try again"
             }
         },
-        mutationFn: async () => {
+        mutationFn: async () => {            
             const provider = new GoogleAuthProvider();
-            const cred = await signInWithPopup(auth, provider);
+            let cred: UserCredential | null = null;
 
             try {
+                cred = await signInWithPopup(auth, provider);
                 await getUser.mutateAsync(cred.user.uid);
             } catch (error) {
                 const errorMsg = 'An Occured while performing google auth please try again later';
 
-                if (error instanceof AxiosError && error.response && error.response.status === 404) {
+                if (error instanceof FirebaseError) {
+                    if (error.code === 'auth/popup-closed-by-user') {
+                        return;
+                    } else {
+                        errorToast(error.message);
+                        return;
+                    }
+                }
+
+                if (error instanceof AxiosError && error.response && error.response.status === 404  && cred) {
                     setGoogleUser({
                         email: cred.user.email || "",
                         userId: cred.user.uid,

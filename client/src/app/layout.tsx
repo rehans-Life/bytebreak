@@ -36,7 +36,7 @@ export default async function RootLayout({
                   <Image height={1080} width={1080} src="/logo.png" alt="log" className="w-6 h-6 object-contain" />
                 </div>
               </div>}>
-                {/* <Header /> */}
+                <Header />
                 {children}
               </Suspense>
             </ReactQueryProvider>
