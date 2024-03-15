@@ -42,7 +42,7 @@ jobs:
         uses: appleboy/ssh-action@master
         env:
           PORT: ${{ secrets.PORT }}
-          DP_PASSWORD: ${{ secrets.DP_PASSWORD }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           DB_URI: ${{ secrets.DB_URI }}
           JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
           JWT_EXPIRES_IN: ${{ secrets.JWT_EXPIRES_IN }}
@@ -54,7 +54,7 @@ jobs:
           host: ${{ secrets.VM_INSTANCE_IP }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          envs: PORT,DP_PASSWORD,DB_URI,JWT_SECRET_KEY,JWT_EXPIRES_IN,JWT_COOKIE_EXPIRES_IN,FIREBASE_STORAGE_URI,FRONTEND_URI,JUDGE0_API
+          envs: PORT,DB_PASSWORD,DB_URI,JWT_SECRET_KEY,JWT_EXPIRES_IN,JWT_COOKIE_EXPIRES_IN,FIREBASE_STORAGE_URI,FRONTEND_URI,JUDGE0_API
           script: |
             docker compose -f /home/${{ secrets.SSH_USERNAME }}/docker-compose.yml down --remove-orphans
             docker image prune -af
