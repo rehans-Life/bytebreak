@@ -1,5 +1,19 @@
-node_modules
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# production
+/.next
+
+# misc
+.DS_Store
+.env
 .env.local
-.next
-README.node_modules
-npm-debug.log
+.env.development.local
+.env.test.local
+.env.production.local
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

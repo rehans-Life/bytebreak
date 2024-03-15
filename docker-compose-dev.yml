@@ -16,6 +16,8 @@ services:
   client:
     depends_on:
       - api
+    env_file:
+      - ./client/.env.local
     restart: always
     build:
       context: ./client
@@ -25,6 +27,8 @@ services:
       - ./client:/usr/app
   api:
     restart: always
+    env_file:
+      - ./server/.env
     build:
       context: ./server
       dockerfile: Dockerfile.dev

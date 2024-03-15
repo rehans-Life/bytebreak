@@ -20,6 +20,8 @@ FROM gcr.io/distroless/nodejs20-debian11
 
 WORKDIR /usr/app
 
+ENV NODE_ENV=Production
+
 COPY --from=builder /usr/app/.next/standalone ./
 COPY --from=builder /usr/app/public ./public
 COPY --from=builder /usr/app/.next/static ./.next/static
