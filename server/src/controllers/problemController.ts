@@ -243,7 +243,7 @@ export const createProblem: RequestHandler = catchAsync(
       }
 
       if (submission.status.id >= 5) {
-        console.log(submission.stderr)
+        console.log(submission)
         throw new AppError(
           `An error occured while executing your solution code against the testcases please try again after fixing it`,
           417,
