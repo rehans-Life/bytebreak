@@ -24,6 +24,7 @@ services:
     image: rehanslife/byte-nginx
     ports:
       - '80:80'
+      - '443:443'
 
   client:
     depends_on:
