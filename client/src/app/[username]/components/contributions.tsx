@@ -14,13 +14,14 @@ TimeAgo.addDefaultLocale(en)
 
 import ReactTimeAgo from 'react-time-ago'
 import ConstributionSkeleton from '@/skeletons/constribution-skeleton';
+import { StatusTypes } from '@/app/interfaces';
 
 export const selectedTabAtom = atom<number>(0);
 const tabs = ["submissions", "problems"];
 
 function ContributionRow({
-    name, path, date, isFetching
-}: { name: string, path?: string, date: string, isFetching: boolean }) {
+    name, path, date, isFetching, status
+}: { name: string, path?: string, date: string, isFetching: boolean,status?: StatusTypes }) {
     const router = useRouter();
 
     return <div
@@ -28,7 +29,7 @@ function ContributionRow({
             if (path) router.push(path)
         }}
         className={`p-4 ${isFetching && "opacity-50"} even:bg-transparent odd:bg-dark-layer-3 cursor-pointer  rounded-md flex xs:items-center items-start justify-between gap-x-3 xs:flex-row flex-col gap-y-2`}>
-        <div className='font-medium'>{name}</div>
+        <div className='font-medium'>{name} {status && <span className={`text-xs font-normal ${ status === 'Accepted' ? 'text-dark-green-s' : 'text-dark-pink' }`}>({status})</span>}</div>
         <div className='text-dark-label-2 text-sm'>
             <ReactTimeAgo date={new Date(date)} locale="en-US" />
         </div>
@@ -87,7 +88,9 @@ export default function Constributions() {
                         (selectedTab === 0 && (data?.submissions ? (
                             data.submissions.length
                                 ? data.submissions.map((sub, i) =>
-                                    <ContributionRow key={i} isFetching={!isFetched} name={sub.problem?.name || "Problem Deleted"} path={sub.problem ? `/problems/${sub.problem.slug}/submissions/${sub._id}` : undefined} date={sub.createdAt} />
+                                    <ContributionRow key={i} isFetching={!isFetched} name={sub.problem?.name || "Problem Deleted"} path={sub.problem ? `/problems/${sub.problem.slug}/submissions/${sub._id}` : undefined} date={sub.createdAt}
+                                        status={sub.status}
+                                    />
                                 )
                                 : <NoData />) : <ContributionSkeleton />)
                         )

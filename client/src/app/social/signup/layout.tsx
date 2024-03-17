@@ -1,9 +1,9 @@
-import type { Metadata } from 'next'
+import { Metadata } from 'next'
 import React, { ReactNode } from 'react'
 
 export const metadata: Metadata = {
-  title: 'Log In',
-  description: 'Login to Bytebreak',
+    title: 'Google Sign In',
+    description: 'Sign In With Google on Bytebreak',
 }
 
 export default function layout({

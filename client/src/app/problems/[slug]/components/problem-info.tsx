@@ -53,10 +53,10 @@ export default function ProblemInfo({
                     </SectionTab>
                 </div>
             </SectionHeader>
-            <SectionBody>
-                <div className='overflow-y-scroll'>
+            <SectionBody className='overflow-auto'>
+                {/* <div className='overflow-y-scroll'> */}
                     {children}
-                </div>
+                {/* </div> */}
             </SectionBody>
             <SectionFooter>
                 <LeftFooter problemId={_id}></LeftFooter>

@@ -39,7 +39,7 @@ export default function TestcasesSection() {
     const isExecuting = useAtomValue(isExecutingAtom);
 
     return (
-        <Section className='overflow-auto'>
+        <Section>
             <SectionHeader>
                 <SectionTab active={selectedTab === 0} onClick={() => setSelectedTab(0)}>
                     <RiCheckboxLine className='text-dark-green-hover text-lg' />
@@ -50,7 +50,7 @@ export default function TestcasesSection() {
                     Test Result
                 </SectionTab>
             </SectionHeader>
-            <SectionBody>
+            <SectionBody className='overflow-auto'>
                 <div className='min-w-96 h-72'>
                     {selectedTab === 0 && <div className='py-4 px-6 flex flex-col gap-y-4 overflow-y-auto'>
                         <div className='flex items-center gap-x-3 gap-y-2 flex-wrap'>

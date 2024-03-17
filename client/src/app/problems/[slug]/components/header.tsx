@@ -15,10 +15,9 @@ import { useFormContext } from 'react-hook-form';
 import { TestCasesType } from '../interfaces';
 import { CodeError, InvalidTestcase, executionResultAtom, testcaseTabAtom } from '@/atoms/testcaseAtoms';
 import { useRouter } from 'next/navigation';
-import { SubmissionDoc } from '@/app/interfaces';
+import { ApiErrorResponse, SubmissionDoc } from '@/app/interfaces';
 import { AxiosError } from 'axios';
 import { CgSpinner } from '@react-icons/all-files/cg/CgSpinner';
-import toast from 'react-hot-toast';
 import {
     Dialog,
     DialogContent,
@@ -30,6 +29,7 @@ import Select, { Option } from '@/app/components/select';
 import Image from 'next/image';
 import Link from 'next/link';
 import { showSignInToast } from '@/toasts/signInReminder';
+import { errorToast } from '@/toasts/errorToast';
 
 export const fontSizes: Option<number>[] = Array(10).fill(0).map((_, i) => {
     const size = 12 + i;
@@ -121,12 +121,17 @@ export default function Header() {
         } catch (err) {
             const error = err as AxiosError
 
+            console.log(error)
+
             if (error.response && [409, 417].some((code) => error.response?.status === code)) {
                 (error.response?.data as any).code = error.response.status;
                 const data = error!.response!.data as (InvalidTestcase | CodeError)
                 setExecutionResult(data);
+            } else if (error.response && (404 === error.response.status)) {
+                errorToast((error.response.data as ApiErrorResponse).message);
+                setTestcaseTab(0);
             } else {
-                toast.error(error.message)
+                errorToast(error.message)
                 setTestcaseTab(0);
             }
         }

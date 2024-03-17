@@ -2,6 +2,7 @@ import React, { ChangeEvent } from 'react'
 import { useMutation } from '@tanstack/react-query';
 import { uploadFile } from '@/utils/api';
 import Loading from './loading';
+import Image from 'next/image';
 
 export default function ProfilePhotoInput({
     name,
@@ -26,7 +27,7 @@ export default function ProfilePhotoInput({
 
     return (
         <div className='flex-col flex justify-center items-center gap-y-2'>
-            <img width={1080} height={1080} src={value} alt="profile-picture" className='h-28 w-28 border border-dark-gray-6 rounded-full' />
+            <Image width={1080} height={1080} src={value} alt="profile-picture" className='h-28 w-28 border border-dark-gray-6 rounded-full' />
             {isPending ? <Loading /> : <label htmlFor="profile-photo" className='cursor-pointer flex gap-y-1 items-center flex-col justify-center relative'>
                 <div className='text-sm text-dark-gray-7'>Change Profile Photo</div>
                 <input type="file" name={name} id='profile-photo' className='hidden' onBlur={onBlur} onChange={(event) => {

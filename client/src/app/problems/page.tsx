@@ -89,8 +89,8 @@ export default function Problems() {
     queryFn: getTags
   });
 
-  return <div>
-    <div className='px-4 py-8 w-full text-white flex items-center justify-center flex-col'>
+  return <div className='h-full'>
+    <div className='px-4 py-8 h-full w-full text-white flex items-center justify-center flex-col'>
       <div className='w-full max-w-[900px] flex items-center justify-center flex-col gap-y-6'>
         <div className='sm:grid flex flex-col sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 w-full sm:gap-2 gap-y-3'>
           <Select

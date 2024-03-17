@@ -24,8 +24,9 @@ export default async function RootLayout({
     <JotaiProvider>
       <html lang="en">
         <head>
+          <link rel="icon" href="/icon.png" type='image/png' />
         </head>
-        <body className="bg-dark-layer-2">
+        <body className="bg-dark-layer-2 min-h-screen">
           <ThemeProvider
             forcedTheme='dark'
           >

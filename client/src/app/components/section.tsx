@@ -3,14 +3,11 @@
 import React, { ReactNode } from 'react'
 
 export function Section({
-    className,
     children
-}: { children: ReactNode, className?: string }) {
+}: { children: ReactNode }) {
     return (
-        <div className='border-dark-gray-6 h-full border relative rounded-md overflow-hidden'>
-            <div className={`${className} h-full relative flex flex-col bg-dark-layer-1`}>
-                {children}
-            </div>
+        <div className={`border-dark-gray-6 h-full border relative rounded-md overflow-hidden flex flex-col bg-dark-layer-1`}>
+            {children}
         </div>
     )
 }
@@ -29,15 +26,16 @@ export function SectionTab({
 export function SectionHeader({
     children
 }: { children: ReactNode }) {
-    return <div className="section-header w-full left-0 right-0 z-50 sticky divide-dark-border top-0 gap-y-2 flex items-center p-1 bg-dark-layer-3">
+    return <div className="w-full left-0 right-0 z-50 sticky divide-dark-border top-0 gap-y-2 flex items-center p-1 bg-dark-layer-3">
         {children}
     </div>
 }
 
 export function SectionBody({
+    className,
     children
-}: { children: ReactNode }) {
-    return <>{ children }</>
+}: { children: ReactNode, className?: string }) {
+    return <div className={`${className} h-full`} >{ children }</div>
 }
 
 export function SectionFooter({

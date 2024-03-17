@@ -34,14 +34,14 @@ export default function CodeEditor() {
     )
 
     return (
-        <Section className='overflow-x-auto overflow-y-hidden'>
+        <Section>
             <SectionHeader>
                 <SectionTab>
                     <IoCodeSlash className="text-dark-green-hover text-lg" />
                     Code
                 </SectionTab>
             </SectionHeader>
-            <SectionBody>
+            <SectionBody className='overflow-x-auto overflow-y-hidden'>
                 <div
                     className='min-w-96 h-full'
                 >

@@ -42,31 +42,23 @@ export default function GoogleButton() {
         },
         mutationFn: async () => {            
             const provider = new GoogleAuthProvider();
-            let cred: UserCredential | null = null;
+            let userCred: UserCredential | null = null;
 
             try {
-                cred = await signInWithPopup(auth, provider);
-                await getUser.mutateAsync(cred.user.uid);
+                userCred = await signInWithPopup(auth, provider);
+                await getUser.mutateAsync(userCred.user.uid);
             } catch (error) {
                 const errorMsg = 'An Occured while performing google auth please try again later';
 
                 if (error instanceof FirebaseError) {
-                    if (error.code === 'auth/popup-closed-by-user') {
-                        return;
-                    } else {
+                    if (error.code !== 'auth/popup-closed-by-user') {
                         errorToast(error.message);
-                        return;
                     }
+                    return;
                 }
 
-                if (error instanceof AxiosError && error.response && error.response.status === 404  && cred) {
-                    setGoogleUser({
-                        email: cred.user.email || "",
-                        userId: cred.user.uid,
-                        username: cred.user.displayName || "",
-                        photo: cred.user.photoURL || defaultPhoto,
-                    })
-                    router.push('/social/signup')
+                if (error instanceof AxiosError && error.response && error.response.status === 404  && userCred) {
+                    router.push(`/social/signup`)
                     return;
                 }
 

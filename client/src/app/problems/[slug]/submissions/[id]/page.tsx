@@ -65,7 +65,7 @@ export default function Page({
         </div>
     }
 
-    return (<div className='overflow-y-auto min-w-96 sm:h-full h-80'>
+    return (<div className='min-w-96 sm:h-full h-80'>
         <div
             onClick={() => {
                 router.back()

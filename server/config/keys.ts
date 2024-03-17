@@ -1,4 +1,3 @@
-import dev from './dev'
 import prod from './prod'
 
 export interface IKeys {
@@ -25,10 +24,10 @@ export interface IProdKeys extends IKeys {
 
 let keys: IDevKeys | IProdKeys
 
-if (process.env.NODE_ENV === 'Development') {
-  keys = dev
+if ((process.env.NODE_ENV || '').trim() === 'Development') {
+  keys = require('./dev').default
 } else {
-  keys = prod
+  keys = require('./prod').default
 }
 
 export default keys

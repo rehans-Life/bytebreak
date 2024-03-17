@@ -18,15 +18,14 @@ import {
   Like,
   ProblemStatus,
   Tag,
-  Submission,
 } from '../app/interfaces'
 import axios from './axios'
 import { Judge0Submission } from '@/atoms/testcaseAtoms'
-import { IUser, UserInfo } from '@/atoms/userAtom'
+import { IGoogleUser, IUser, UserInfo } from '@/atoms/userAtom'
 import { SignUpFormType } from '@/app/signup/page'
 import { LoginFormType } from '@/app/login/page'
 import createFormData from './createFormData'
-import { SignInFormType } from '@/app/social/signup/page'
+import { SignInFormType } from '@/app/social/signup/signIn'
 import { ProblemsCount, UserCalender } from '@/app/[username]/interfaces'
 
 export const getMe = async () => {
@@ -84,7 +83,7 @@ export const getGoogleUser: MutationFunction<IUser, string> = async (
   return data.data.user
 }
 
-export const createGoogleUser: MutationFunction<IUser, SignInFormType> = async (
+export const createGoogleUser: MutationFunction<IUser, IGoogleUser> = async (
   user
 ) => {
   const { data } = await axios.post<ApiSuccessResponse<IUser>>(

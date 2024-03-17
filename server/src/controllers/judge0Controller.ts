@@ -34,10 +34,12 @@ export const batchSubmission = async (
   config: ProblemConfig,
   testCases: TestCases,
 ) => {
+  console.log(language_id)
+
   const language = await Tag.findOne({
     $and: [
       {
-        _id: language_id,
+        _id: Number(language_id),
       },
       {
         category: 'language',

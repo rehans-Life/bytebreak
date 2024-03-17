@@ -27,7 +27,7 @@ export default function Page({
     })
 
     return (
-        <div className='w-full flex justify-start overflow-y-auto min-w-96 sm:h-full h-80'>
+        <div className='w-full flex justify-start min-w-96 sm:h-full h-80'>
             <div className='text-white p-5 w-full sm:w-[80%] flex items-center'>
                 {isLoading
                     ? <EditorialSkeleton />
