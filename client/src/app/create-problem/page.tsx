@@ -151,7 +151,7 @@ export default function Create() {
                   All params should be seperated by new line (\n) character.
                   <a
                     target="_blank"
-                    href="https://firebasestorage.googleapis.com/v0/b/tesla-clone-a0f5d.appspot.com/o/testcases%2Fsample-testcases.json?alt=media&token=a3d2d4d0-2bc9-43ca-a6e0-dbee0a941d21"
+                    href="https://firebasestorage.googleapis.com/v0/b/tesla-clone-a0f5d.appspot.com/o/testcases%2Ftestcases.json?alt=media&token=48824bdc-6b1a-4bbe-9b04-c019479095c8"
                     className="text-blue-500 hover:underline ml-1"
                   >
                     Have a look at a template json file here.

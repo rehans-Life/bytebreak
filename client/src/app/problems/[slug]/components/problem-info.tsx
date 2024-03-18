@@ -1,4 +1,4 @@
-import React, { ReactNode, useState } from 'react'
+import React, { ReactNode, useEffect, useState } from 'react'
 import { Section, SectionBody, SectionHeader, SectionFooter, SectionTab } from '@/app/components/section';
 import { IoDocumentTextOutline } from "@react-icons/all-files/io5/IoDocumentTextOutline";
 import { HiOutlineBookOpen } from "@react-icons/all-files/hi/HiOutlineBookOpen";
@@ -24,6 +24,9 @@ export default function ProblemInfo({
     const location = useAtomValue(locationAtom)
     const [currTab, setCurrTab] = useState(location.pathname?.split("/")[location.pathname?.split("/").length - 1])
 
+    useEffect(() => {
+        setCurrTab(location.pathname?.split("/")[location.pathname?.split("/").length - 1])
+    }, [location]);
 
     return (
         <Section>
@@ -54,9 +57,7 @@ export default function ProblemInfo({
                 </div>
             </SectionHeader>
             <SectionBody className='overflow-auto'>
-                {/* <div className='overflow-y-scroll'> */}
                     {children}
-                {/* </div> */}
             </SectionBody>
             <SectionFooter>
                 <LeftFooter problemId={_id}></LeftFooter>
