@@ -127,7 +127,7 @@ export default function Editor() {
               setCodes({
                 ...codes,
                 [lang.value]: {
-                  restrictedLines,
+                  restrictedLines: JSON.parse(JSON.stringify(restrictedLines)),
                   code: generateCodeConfig(lang.value as langs, config)
                 }
               })

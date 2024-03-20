@@ -24,7 +24,7 @@ export default function Testcase() {
                     {Object.entries(testcasesField[selectedTestcase].input).map(([key]) => {
                         const field = register(`testcases.${selectedTestcase}.input.${key}` as any);
                         return <Input
-                            label={`${problem?.config.params[key as unknown as number].name} =` || ""}
+                            label={`${problem?.config.params[key as unknown as number]?.name} =` || ""}
                             key={`testcases.${selectedTestcase}.input.${key}`}
                             {...field}
                             inputStyles='!bg-dark-layer-3 !rounded-md !border-1 !py-2 !px-3 !border-transparent hover:!border-dark-blue-s'

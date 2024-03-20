@@ -27,8 +27,8 @@ export default function Page({
     })
 
     return (
-        <div className='w-full flex justify-start min-w-96 sm:h-full h-80'>
-            <div className='text-white p-5 w-full sm:w-[80%] flex items-center'>
+        <div className='w-full min-w-96 sm:h-full h-80'>
+            <div className='text-white p-5 w-full flex items-center'>
                 {isLoading
                     ? <EditorialSkeleton />
                     : <MarkdownPreview className='!text-sm w-full' source={data?.text}></MarkdownPreview>

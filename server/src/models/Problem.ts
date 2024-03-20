@@ -104,6 +104,7 @@ const ProblemSchema = new Schema<IProblem>(
     },
     slug: {
       type: String,
+      unique: true,
     },
     difficulty: {
       type: String,

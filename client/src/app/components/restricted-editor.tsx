@@ -27,7 +27,6 @@ export default function RestrictedEditor({
     useEffect(() => {
         if (restrictedAreas === restrictedLines) return;
         setRestrictedAreas(restrictedLines);
-
     }, [restrictedLines]);
 
     useEffect(() => {
@@ -42,39 +41,48 @@ export default function RestrictedEditor({
                 onMount?.(editor, monaco)
             }}
             theme='vs-dark'
-            saveViewState={false}
             options={options}
             value={value}
             language={language}
             onChange={(value, ev) => {
                 if (ev.isUndoing) return;
-
+                
                 const { changes: [change] } = ev;
                 const newValue = value!.split("\n");
-
+                
                 const changeValue = change.text;
-                const changeLine = change.range.startLineNumber
-
+                const changeLine = change.range.endLineNumber
+                const changeCol = change.range.endColumn;
+                
                 if (restrictedAreas.some((line) => line === changeLine)) {
-                    editorRef.current?.trigger('', 'undo', {})
-                    return;
-                }
-
-                const isWithinRestricted = restrictedAreas.some((line) => line > changeLine);
-
-                if (isWithinRestricted && changeValue.includes("\n")) {
-                    setRestrictedAreas(restrictedAreas.map((line) => line > changeLine ? line + 1 : line))
-                }
-
-                if (changeValue === '' && newValue.length < previousValue.current.length) {
-                    if (!restrictedAreas.some((line) => line === (changeLine + 1))) {
-                        setRestrictedAreas(restrictedAreas.map((line) => line > changeLine ? line - 1 : line))
+                    if (changeValue === "\n" && changeCol === 1 && changeLine === restrictedAreas.sort((a,b) => a-b)[0]) {
+                        setRestrictedAreas(restrictedAreas.map((line) => 
+                            line >= changeLine ? (line + 1) : line
+                        ))
+                    } else if (!changeValue.length && changeCol === 1 && changeLine === restrictedAreas.sort((a,b) => a-b)[0]) {
+                        setRestrictedAreas(restrictedAreas.map((line) => 
+                            line >= changeLine ? (line - 1) : line
+                        ))
                     } else {
                         editorRef.current?.trigger('', 'undo', {})
                         return;
                     }
                 }
 
+                const isWithinRestricted = !restrictedAreas.some((line) => line === changeLine);
+
+                if (isWithinRestricted && changeValue.includes("\n")) {
+                    setRestrictedAreas(restrictedAreas.map((line) => line > changeLine ? line + 1 : line))
+                }
+
+                if (changeValue === '' && newValue.length < previousValue.current.length) {
+                    if (restrictedAreas.sort((a,b) => a-b)[0] || !restrictedAreas.some((line) => line === (changeLine + 1))) {
+                        setRestrictedAreas(restrictedAreas.map((line) => line > changeLine ? line - (change.range.endLineNumber - change.range.startLineNumber) : line))
+                    } else {
+                        editorRef.current?.trigger('', 'undo', {})
+                        return;
+                    }
+                }
                 onChange(value)
                 previousValue.current = newValue;
             }}

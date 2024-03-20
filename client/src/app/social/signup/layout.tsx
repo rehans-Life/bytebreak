@@ -6,8 +6,8 @@ export const metadata: Metadata = {
     description: 'Sign In With Google on Bytebreak',
 }
 
-export default function layout({
-    children
+export default async function layout({
+    children,
 }: { children: ReactNode }) {
   return (
     <>{children}</>
