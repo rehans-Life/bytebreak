@@ -14,6 +14,9 @@ export const paginationPipeline = (
 ) => {
   return Resource.aggregate()
     .match(filter as { [x: string]: any })
+    .sort({
+      createdAt: -1,
+    })
     .project(fields as unknown as { [key: string]: any })
     .group({
       _id: '',

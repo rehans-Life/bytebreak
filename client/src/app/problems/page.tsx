@@ -197,7 +197,7 @@ export default function Problems() {
                   onClick={() => router.push(`/problems/${row.slug}`)}
                 >
                   <div className="hover:text-dark-blue-s text-nowrap">
-                    {capitalize.words(row.name)}
+                    {row.name}
                   </div>
                 </TooltipContainer>
               </td>

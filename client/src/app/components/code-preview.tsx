@@ -37,7 +37,7 @@ export default function CodePreview({
                     onClick={() => setShowMore(prev => !prev)}
                     id='more'
                     className='cursor-pointer text-sm text-dark-label-2 gap-x-1 z-99 flex items-center justify-center w-full'>
-                    {showMore ? <ChevronsUp className='h-5 w-5' /> : <ChevronsDown className='h-5 w-5' />} View More
+                    {showMore ? <ChevronsUp className='h-5 w-5' /> : <ChevronsDown className='h-5 w-5' />} View {showMore ? 'Less' : 'More'}
                 </div>
             </div>
         </div>

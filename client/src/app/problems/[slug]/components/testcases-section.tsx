@@ -36,6 +36,8 @@ export default function TestcasesSection() {
 
     }, [testcasesField.fields.length]);
 
+    useEffect(() => () => setSelectedTab(0), []); 
+
     const isExecuting = useAtomValue(isExecutingAtom);
 
     return (

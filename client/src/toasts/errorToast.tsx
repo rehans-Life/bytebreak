@@ -9,7 +9,7 @@ export const errorToast = (message: string) => {
             fontSize: "14px"
         },
         className: 'rounded-2xl',
-        duration: 2000
+        duration: 4000
     })
     return;
 }

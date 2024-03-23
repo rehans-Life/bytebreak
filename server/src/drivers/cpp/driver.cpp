@@ -11,6 +11,7 @@
 #include <type_traits>
 #include <utility>
 #include <ostream>
+#include <stdexcept>
 
 using namespace std;
 
@@ -86,7 +87,7 @@ void printOutput(int output)
 
 void printOutput(bool output)
 {
-    cout << output;
+    cout << std::boolalpha << output;
 }
 
 namespace JSON
@@ -705,12 +706,38 @@ public:
     }
 };
 
-vector<string>
-convertToArr(string arr)
+vector<string> convertMatrixString(string arr) {
+    try {
+        if (arr.at(0) != '[' || arr.at(arr.length() - 1) != ']') {
+            throw invalid_argument("");
+        }
+
+        arr = regex_replace(arr, regex("\\\\|\"|\'|\\s"), "");
+        arr = arr.size() == 2 ? "" : arr.substr(1, arr.size() - 2);
+        std::regex_token_iterator<std::string::iterator> rend;
+
+        regex re("(\\[.+?])");
+        smatch sm;
+
+        regex_token_iterator<string::iterator> first( arr.begin(), arr.end(), re), last;
+        vector<string> args{first, last};
+
+        return args;
+    } catch (const exception &e) {
+        cerr << arr << " is not a valid value of type Array";
+        exit(1);
+    }
+}
+
+vector<string> convertToArr(string arr)
 {
     try
     {
-        arr = regex_replace(arr, regex("\\\\|\\[|]|\"|\\s"), "");
+        if (arr.at(0) != '[' || arr.at(arr.length() - 1) != ']') {
+            throw invalid_argument("");
+        }
+
+        arr = regex_replace(arr, regex("\\\\|\"|\'|\\[|]|\\s"), "");
 
         regex re(",");
         sregex_token_iterator first{arr.begin(), arr.end(), re, -1}, last;
@@ -727,6 +754,9 @@ convertToArr(string arr)
 
 int convertToInt(string str)
 {
+    bool isNegative = str.at(0) == '-';
+    if (str.at(0) == '-') str = str.substr(1);  
+
     int i = 0;
 
     for (char c : str)
@@ -742,7 +772,7 @@ int convertToInt(string str)
         }
     }
 
-    return i;
+    return isNegative ? i*-1 : i;
 }
 
 class Solution {}
@@ -778,6 +808,36 @@ vector<int> convertArg<vector<int>>(const string &arg)
     for (string str : convertToArr(arg))
     {
         temp.push_back(convertToInt(str));
+    }
+
+    return temp;
+}
+
+template <> // specialization for bool
+vector<vector<string>> convertArg<vector<vector<string>>>(const string &arg)
+{
+    vector<vector<string>> temp;
+
+    for (string str : convertMatrixString(arg))
+    {
+        temp.push_back(convertToArr(str));
+    }
+
+    return temp;
+}
+
+template <> // specialization for bool
+vector<vector<int>> convertArg<vector<vector<int>>>(const string &arg)
+{
+    vector<vector<int>> temp;
+
+    for (string str : convertMatrixString(arg))
+    {
+        vector<int> temp1;
+        for (string el : convertToArr(str)) {
+            temp1.push_back(convertToInt(el));
+        }
+        temp.push_back(temp1);
     }
 
     return temp;

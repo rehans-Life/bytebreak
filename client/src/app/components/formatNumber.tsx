@@ -25,7 +25,7 @@ export default function FormatNumber({
         formattedNum = `${splitNum[0]}${splitNum[1]?.[0] !== "0" ? `.${splitNum[1]?.[0]}` : ""}`;
 
     } else {
-        formattedNum = splitNum[0];
+        formattedNum = splitNum ? splitNum[0]: "";
     }
 
     return (

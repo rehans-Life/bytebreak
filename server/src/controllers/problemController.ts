@@ -226,6 +226,15 @@ export const createProblem: RequestHandler = catchAsync(
     solutionSchema.parse(solution)
     configSchema.parse(config)
 
+    testcases.forEach(({ input }, i) => {
+      if (input.split('\n').length !== config.params.length) {
+        throw new AppError(
+          `The number of inputs in testcase ${i + 1} is not equal to the number of params specified in the configuration`,
+          400,
+        )
+      }
+    })
+
     const submissions = await batchSubmission(
       solution.code,
       solution.languageId,
@@ -233,23 +242,29 @@ export const createProblem: RequestHandler = catchAsync(
       testcases,
     )
 
-    submissions.forEach((submission, i) => {
+    for (let i = 0; i < submissions.length; i++) {
+      const submission = submissions[i]
       const { input, output } = testcases[i]
+
       if (submission.status.id === 4) {
-        throw new AppError(
-          `Expected output: ${output} but recieved ${submission.stdout} from solution code for Input: ${input.split('\n').join(',')}`,
-          417,
-        )
+        return res.status(417).json({
+          status: submission.status.description,
+          message: `Expected output: ${output} but recieved ${submission.stdout} from solution code for Input: ${input.split('\n').join(',')}`,
+        })
       }
 
       if (submission.status.id >= 5) {
         console.log(submission)
-        throw new AppError(
-          `An error occured while executing your solution code against the testcases please try again after fixing it`,
-          417,
-        )
+        return res.status(417).json({
+          status: submission.status.description,
+          message: submission.stderr
+            ? submission.stderr
+            : submission.compile_output
+              ? submission.compile_output
+              : `An error occured while executing your solution code against the testcases please try again after fixing it`,
+        })
       }
-    })
+    }
 
     const problem = await Problem.create({
       ...req.body,

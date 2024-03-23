@@ -30,7 +30,7 @@ export default function RestrictedEditor({
     }, [restrictedLines]);
 
     useEffect(() => {
-        previousValue.current = []
+        previousValue.current = value?.split("\n") || [];
     }, [language])
 
     return (
@@ -50,16 +50,29 @@ export default function RestrictedEditor({
                 const { changes: [change] } = ev;
                 const newValue = value!.split("\n");
                 
-                const changeValue = change.text;
+                let changeValue = change.text;
                 const changeLine = change.range.endLineNumber
                 const changeCol = change.range.endColumn;
-                
+                const changeLines = changeValue.split("\n").length;
+
                 if (restrictedAreas.some((line) => line === changeLine)) {
-                    if (changeValue === "\n" && changeCol === 1 && changeLine === restrictedAreas.sort((a,b) => a-b)[0]) {
-                        setRestrictedAreas(restrictedAreas.map((line) => 
-                            line >= changeLine ? (line + 1) : line
-                        ))
-                    } else if (!changeValue.length && changeCol === 1 && changeLine === restrictedAreas.sort((a,b) => a-b)[0]) {
+
+                    changeValue = changeValue.replace(/\t/g, '')
+                    const leastLine = restrictedAreas.sort((a,b) => a-b)[0];
+                    const lineContent = previousValue.current[leastLine - 1] || "";
+
+                    if (changeValue === "\n" && changeLine === leastLine) {
+
+                        if (changeCol === 1) {
+                            setRestrictedAreas(restrictedAreas.map((line) => 
+                                line >= changeLine ? (line + 1) : line
+                            ))
+                        } else if (changeCol >= lineContent.length) {
+                            setRestrictedAreas(restrictedAreas.map((line) => 
+                                line > changeLine ? (line + 1) : line
+                            ))
+                        }
+                    } else if (!changeValue.length && changeCol === 1 && changeLine === leastLine) {
                         setRestrictedAreas(restrictedAreas.map((line) => 
                             line >= changeLine ? (line - 1) : line
                         ))
@@ -72,11 +85,11 @@ export default function RestrictedEditor({
                 const isWithinRestricted = !restrictedAreas.some((line) => line === changeLine);
 
                 if (isWithinRestricted && changeValue.includes("\n")) {
-                    setRestrictedAreas(restrictedAreas.map((line) => line > changeLine ? line + 1 : line))
+                    setRestrictedAreas(restrictedAreas.map((line) => line > changeLine ? line + (changeLines - 1) : line))
                 }
 
                 if (changeValue === '' && newValue.length < previousValue.current.length) {
-                    if (restrictedAreas.sort((a,b) => a-b)[0] || !restrictedAreas.some((line) => line === (changeLine + 1))) {
+                    if (!restrictedAreas.some((line) => line === (changeLine + 1))) {
                         setRestrictedAreas(restrictedAreas.map((line) => line > changeLine ? line - (change.range.endLineNumber - change.range.startLineNumber) : line))
                     } else {
                         editorRef.current?.trigger('', 'undo', {})

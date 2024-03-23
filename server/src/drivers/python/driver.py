@@ -24,7 +24,7 @@ def convertToType(type: str, arg: str):
         elif type in ['Integer[][]', 'String[][]']:
             temp = loads(arg)
 
-            if (len(filter(lambda el: isinstance(el, list), temp)) != len(temp)):
+            if (len(list(filter(lambda el: isinstance(el, list), temp))) != len(temp)):
                 raise TypeError()
         
             return temp
@@ -54,6 +54,8 @@ def main():
 
     if(isinstance(output, list)):
         stdout.write(re.sub("\s|\"", "", dumps(output)))
+    elif (isinstance(output, bool)):
+        stdout.write(str(output).lower()) 
     else:
         stdout.write(str(output))
 

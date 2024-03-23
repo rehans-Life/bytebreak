@@ -7,6 +7,7 @@ import {
   SubmitHandler,
   useForm,
 } from 'react-hook-form'
+
 import { EditorView } from '@codemirror/view'
 import FileInput from '@/app/components/file-input'
 import { Problem, ProblemType, types } from './interfaces'
@@ -15,7 +16,7 @@ import { ProblemSchema } from './schemas'
 import { useAtomValue, useSetAtom } from 'jotai'
 import { languagesAtom, tagsAtom, topicsAtom } from '../../atoms/tagAtoms'
 import { useMutation, useSuspenseQuery, useQueryClient, } from '@tanstack/react-query'
-import { Comment, LanguageTag, TopicTag } from '../interfaces'
+import { ApiErrorResponse, Comment, LanguageTag, TopicTag } from '../interfaces'
 import DefaultForm from '@/app/components/defaultForm'
 import { AxiosError } from 'axios'
 import { useRouter } from 'next/navigation'
@@ -29,6 +30,10 @@ import { difficulties } from '@/data/input-data'
 import '@uiw/react-markdown-editor/markdown-editor.css';
 import '@uiw/react-markdown-preview/markdown.css';
 import { createProblem, getTags } from '@/utils/api'
+import { errorToast } from '@/toasts/errorToast'
+import { useState } from 'react'
+import ErrorDialog from '../components/error-dialog'
+import { CodeError } from '@/atoms/testcaseAtoms'
 
 const MarkdownEditor = dynamicImport(
   () => import("@uiw/react-markdown-editor").then((mod) => mod.default),
@@ -69,6 +74,8 @@ export default function Create() {
   const router = useRouter()
   const queryClient = useQueryClient()
 
+  const [showError, setShowError] = useState(false);
+
   const _ = useSuspenseQuery({
     queryKey: ['tags'],
     meta: {
@@ -79,10 +86,10 @@ export default function Create() {
     queryFn: getTags,
   })
 
-  const { mutate, isPending } = useMutation<{ problem: Problem, editorial: Comment }, AxiosError, ProblemType>({
+  const { mutate, mutateAsync, isPending, reset: resetMutation, error } = useMutation<{ problem: Problem, editorial: Comment }, AxiosError<CodeError | ApiErrorResponse>, ProblemType>({
     onMutate() {
       return {
-        errorMsg: 'An Error occured while creating the problem please try again later'
+        skipErrorHandling: true
       }
     },
     mutationFn: createProblem,
@@ -129,11 +136,30 @@ export default function Create() {
       showSignInToast("You must log in first");
       return;
     }
-    mutate(problem)
+    try {
+      await mutateAsync(problem)
+    } catch (err) {
+      const error = err as AxiosError<ApiErrorResponse | CodeError>;
+
+      if (error.response && error.response.status === 417) {
+        setShowError(true);
+      } else {
+        errorToast(error.response?.data.message || "An Error occured while creating the problem please try again later");
+      }
+    }
   }
 
   return (
     <FormProvider {...methods}>
+      <ErrorDialog  
+          open={showError} 
+          onOpenChange={(_) => {
+            setShowError(false);
+            resetMutation();
+          }} 
+          status={error?.response?.data.status || ""}
+          message={error?.response?.data.message || ""}  
+      />
       <div className="flex w-full pb-16 justify-center">
         <form
           onSubmit={handleSubmit(addProblem)}

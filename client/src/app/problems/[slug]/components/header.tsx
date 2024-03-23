@@ -98,6 +98,8 @@ export default function Header() {
         setExecxutingState(run.isPending);
     }, [run.isPending]);
 
+    useEffect(() => () => setExecutionResult(null), [])
+
     const onRun = async () => {
         if (run.isPending || submit.isPending) return;
 

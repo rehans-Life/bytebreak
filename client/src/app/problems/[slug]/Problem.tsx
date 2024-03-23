@@ -1,7 +1,7 @@
 'use client';
 
 import { useSuspenseQueries } from '@tanstack/react-query'
-import React, { ReactNode } from 'react'
+import React, { ReactNode, useEffect } from 'react'
 import CodeEditor from './components/code-editor';
 import { getDefaultConfigurations, getProblem } from '@/utils/api';
 import { Problem } from '@/app/create-problem/interfaces';
@@ -30,7 +30,7 @@ export default function Problem({
     const setLanguagesConfigs = useSetAtom(languagesAtom)
     const setLang = useSetAtom(selectLanguageAtom)
 
-    const [{ data: { _id, sampleTestCases } }] = useSuspenseQueries({
+    const [{ data: { _id, sampleTestCases } }, { isLoading, data }] = useSuspenseQueries({
         queries: [
             {
                 meta: {
@@ -45,9 +45,7 @@ export default function Problem({
             {
                 meta: {
                     onSuccess: (data: TagWithConfig[]) => {
-                        const firstLang = data[0];
                         setLanguagesConfigs(data)
-                        setLang(firstLang, true)
                     }
                 },
                 queryKey: ['defaultConfiguration', slug],
@@ -55,6 +53,12 @@ export default function Problem({
             }
         ]
     })
+
+    useEffect(() => {
+        const firstLang = data[0];
+        setLang(firstLang, true)       
+    }, [isLoading])
+    
 
     const methods = useForm<TestCasesType>({
         defaultValues: {

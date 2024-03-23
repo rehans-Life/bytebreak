@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.regex.Matcher;
 // Import statements here
 
 /**
@@ -31,11 +32,28 @@ public class Main {
         scanner.close();
     }
 
+    public static String[] convertMatrixString(String list) throws Exception {
+        if (list.charAt(0) != '[' || list.charAt(list.length() - 1) != ']') {
+            throw new Exception("");
+        }
+
+        List<String> allMatches = new ArrayList<String>();
+        Matcher m = Pattern.compile("\\[.+?]")
+            .matcher(list);
+        while (m.find()) {
+          allMatches.add(m.group());
+        }
+
+        String[] res = new String[allMatches.size()];
+        for (int i = 0; i < allMatches.size(); i++) res[i] = allMatches.get(i);
+        return res;
+    }
+
     public static String[] convertToArray(String list) throws Exception {
         if (list.charAt(0) != '[' || list.charAt(list.length() - 1) != ']') {
             throw new Exception("");
         }
-        return list.replaceAll("\\\\|\\[|]|\"|\\s", "").split(",");
+        return list.replaceAll("\\\\|\"|\'|\\[|]|\\s", "").split(",");
     }
 
     public static int[] convertIntArray(String[] strings) {
@@ -61,14 +79,14 @@ public class Main {
 
             switch (type) {
                 case "String[][]":
-                    convertedArray = convertToArray(arg);
+                    convertedArray = convertMatrixString(arg);
                     temp = new String[convertToArray(convertedArray[0]).length][convertedArray.length];
                     for (int i = 0; i < convertedArray.length; i++) {
                         temp[i] = convertToArray(convertedArray[i]);
                     }
                     return temp;
                 case "Integer[][]":
-                    return convertIntMatrix(convertToArray(arg));
+                    return convertIntMatrix(convertMatrixString(arg));
                 case "Integer[]":
                     return convertIntArray(convertToArray(arg));
                 case "String[]":
