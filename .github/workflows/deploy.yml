@@ -61,4 +61,4 @@ jobs:
             docker image prune -af
             docker compose -f /home/${{ secrets.SSH_USERNAME }}/docker-compose.yml build --pull
             docker compose -f /home/${{ secrets.SSH_USERNAME }}/docker-compose.yml up -d
-            docker exec nginx-service certbot --nginx -d defidigital.site -d defidigital.site --noninteractive --redirect --agree-tos --email rehantosif5@gmail.com
+            docker exec nginx-service certbot --nginx -d defidigital.site -d wwww.defidigital.site --noninteractive --redirect --agree-tos --email rehantosif5@gmail.com
