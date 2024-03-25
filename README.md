@@ -8,7 +8,7 @@
   <h3 align="center">ByteBreak</h3>
 
   <p align="center">
-    An Online Execution Engine
+    An Online Code Execution Engine
     <br />
     <a href="https://github.com/rehans-Life/bytebreak"><strong>Explore the docs »</strong></a>
     <br />
@@ -22,7 +22,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-<img src='https://firebasestorage.googleapis.com/v0/b/tesla-clone-a0f5d.appspot.com/o/readMe%2Fhome.png?alt=media&token=54ca28db-bbf4-4e73-ba4d-2fb8b84a1a7c'/>
+<img src='https://firebasestorage.googleapis.com/v0/b/tesla-clone-a0f5d.appspot.com/o/readMe%2FScreenshot%202024-03-25%20094519.png?alt=media&token=caf170c9-9ebe-4788-b986-183c009f3489'/>
 
 When I was learning and researching about data structures and algorithms, I wasn't only fascinated by the different algorithms and techniques that I was learning but also the 
 code execution platforms where I was executing my code inside of. So I ended putting my developer skills to the test and went on to develop my very own online code execution 
