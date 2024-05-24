@@ -4,7 +4,7 @@ import { useSuspenseQueries } from '@tanstack/react-query'
 import React, { ReactNode, useEffect } from 'react'
 import CodeEditor from './components/code-editor';
 import { getDefaultConfigurations, getProblem } from '@/utils/api';
-import { Problem } from '@/app/create-problem/interfaces';
+import { Problem as IProblem } from '@/app/create-problem/interfaces';
 import { useSetAtom } from 'jotai';
 import { problemAtom } from '@/atoms/problemAtoms';
 import Header from './components/header';
@@ -34,7 +34,7 @@ export default function Problem({
         queries: [
             {
                 meta: {
-                    onSuccess: (data: Problem) => {
+                    onSuccess: (data: IProblem) => {
                         setProblem(data)
                     }
                 },
@@ -64,7 +64,7 @@ export default function Problem({
         defaultValues: {
             testcases: sampleTestCases.map((testcase) => {
                 const input = testcase.input
-                    .split("\n")
+                    ?.split("\n")
                     .reduce<{ [key: number]: string }>(
                         (acc, value, index) => {
                             acc[index] = value;

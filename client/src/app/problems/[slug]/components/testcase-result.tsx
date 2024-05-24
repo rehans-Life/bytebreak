@@ -89,7 +89,7 @@ export default function TestcaseResult() {
                         <div className='flex flex-col gap-y-2'>
                             <div className='font-medium text-xs text-dark-label-2'>Input</div>
                             {
-                                executionResult[selectedResult].testcase.input.split("\n").map((value, index) => {
+                                executionResult[selectedResult].testcase.input?.split("\n").map((value, index) => {
                                     return <ValueHolder key={index}>
                                         <div className='flex flex-col gap-y-1'>
                                             <div className='text-xs text-dark-label-1'>
