@@ -12,11 +12,13 @@ import problemRoutes from './routes/problemRoutes'
 import errorController from './controllers/errorController'
 import submissionRoutes from './routes/submissionRoutes'
 
+import convertURI from './utils/addwww'
+
 const app = express()
 
 app.use(
   cors({
-    origin: keys.FRONTEND_URI,
+    origin: [keys.FRONTEND_URI, convertURI(keys.FRONTEND_URI)],
     credentials: true,
   }),
 )
