@@ -301,11 +301,10 @@ export const getProblems: QueryFunction<{
   params.set('page', page)
   params.set('limit', limit)
   tags.forEach((tag, index) => params.set(`tags[all][${index}]`, tag))
-
+  ;('tag[all]=100&tag[all]=105')
   if (status) params.set('status', status)
   if (difficulty) params.set('difficulty', difficulty)
   if (name) params.set('name[regex]', `(?i)${name}`)
-
   params.set(
     'fields',
     '_id,slug,name,accepted,submissions,difficulty,tags,status,likes'

@@ -10,7 +10,11 @@ export const applyType = <T>(
   ) => Promise<any>,
 ): RequestHandler<any, any, T, any> => {
   return (req, res, next) => {
-    schema.parse(req.body)
-    handler(req, res, next).catch(next)
+    try {
+      schema.parse(req.body)
+      handler(req, res, next)
+    } catch (err) {
+      next(err)
+    }
   }
 }

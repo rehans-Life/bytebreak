@@ -37,7 +37,7 @@ public class Main {
             throw new Exception("");
         }
 
-        List<String> allMatches = new ArrayList<String>();
+        ArrayList<String> allMatches = new ArrayList<String>();
         Matcher m = Pattern.compile("\\[.+?]")
             .matcher(list);
         while (m.find()) {
