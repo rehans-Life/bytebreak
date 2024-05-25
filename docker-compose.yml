@@ -22,7 +22,7 @@ services:
       - api
       - client
     restart: always
-    image: rehanslife/byte-nginx
+    image: rehanslife/byte-nginx:latest
     ports:
       - '80:80'
       - '443:443'
@@ -32,12 +32,12 @@ services:
     depends_on:
       - api
     restart: always
-    image: rehanslife/byte-client
+    image: rehanslife/byte-client:latest
 
   api:
     container_name: api-service
     restart: always
-    image: rehanslife/byte-server
+    image: rehanslife/byte-server:latest
     secrets:
       - DB_PASSWORD
       - DB_URI
