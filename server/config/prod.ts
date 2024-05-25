@@ -4,8 +4,14 @@ import { join } from 'path'
 
 const secret_path = '/run/secrets/'
 
-const getValue = (name: string) =>
-  readFileSync(join(secret_path, `${name}`), 'utf-8')
+const getValue = (name: string) => {
+  try {
+    return readFileSync(join(secret_path, `${name}`), 'utf-8')
+  } catch (error) {
+    console.log(error)
+    return ''
+  }
+}
 
 export default {
   PORT: process.env.PORT || '4000',
