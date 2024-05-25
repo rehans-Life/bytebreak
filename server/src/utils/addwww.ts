@@ -1,6 +1,10 @@
 function convertURI(host: string) {
-  const uri = new URL(host)
-  return `${uri.protocol}//www.${uri.host}`
+  try {
+    const uri = new URL(host)
+    return `${uri.protocol}//www.${uri.host}`
+  } catch (error) {
+    return host
+  }
 }
 
-export default convertURI;
+export default convertURI
