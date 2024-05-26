@@ -26,7 +26,7 @@ const RunBodySchema = SubmitBodySchema.extend({
   testcases: testCasesSchema,
 })
 
-export const run = applyType(RunBodySchema, async (req, res) => {
+export const run = applyType(RunBodySchema, async (req, res, next) => {
   const { languageId, code, testcases, problemId } = req.body
   const problem = await Problem.findById(problemId).select('config solution')
 

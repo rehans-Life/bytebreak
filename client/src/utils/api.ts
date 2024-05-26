@@ -158,7 +158,6 @@ export const runCode: MutationFunction<Judge0Submission[], RunVarType> =
       ApiSuccessResponse<{ submissions: Judge0Submission[] }>
     >(`api/v1/submissions/run`, {
       ...variables,
-      languageId: 1
     })
 
     return data.data.submissions

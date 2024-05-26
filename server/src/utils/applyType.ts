@@ -9,12 +9,12 @@ export const applyType = <T>(
     next: NextFunction,
   ) => Promise<any>,
 ): RequestHandler<any, any, T, any> => {
-  return (req, res, next) => {
+  return async (req, res, next) => {
     try {
       schema.parse(req.body)
-      handler(req, res, next)
-    } catch (err) {
-      next(err)
+      await handler(req, res, next)
+    } catch (error) {
+      return next(error)
     }
   }
 }
