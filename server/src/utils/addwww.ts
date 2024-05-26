@@ -3,6 +3,7 @@ function convertURI(host: string) {
     const uri = new URL(host)
     return `${uri.protocol}//www.${uri.host}`
   } catch (error) {
+    console.log(error)
     return host
   }
 }
