@@ -61,7 +61,7 @@ export const run = applyType(RunBodySchema, async (req, res, next) => {
         status: submission.status.description,
         testcaseNo: i,
         testcase,
-        message: submission.stderr || submission.compile_output,
+        message: submission.stderr || submission.compile_output || "Invalid testcase produces an error with the solution code",
       })
     }
   }

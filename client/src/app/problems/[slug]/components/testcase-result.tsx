@@ -56,7 +56,7 @@ export default function TestcaseResult() {
                                 setSelectedTestcase(executionResult.testcaseNo)
                             }}>Edit</div>
                         </div>
-                        <CodeError errorMsg={executionResult.message} />
+                        <CodeError errorMsg={executionResult.message || ""} />
                     </div>
                 </>
             }
