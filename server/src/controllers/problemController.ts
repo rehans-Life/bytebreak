@@ -64,8 +64,6 @@ export const parseTagsField: RequestHandler = catchAsync(
   async (req, _, next) => {
     const { filter } = req.query as unknown as PaginateProbelmQuery
 
-    console.log(filter)
-
     function recurse(obj: { [key: string]: any } | Array<any>) {
       if (obj instanceof Array) {
         obj.forEach((_, key) => helper({ obj, key }))

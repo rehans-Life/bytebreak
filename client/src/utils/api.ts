@@ -158,6 +158,7 @@ export const runCode: MutationFunction<Judge0Submission[], RunVarType> =
       ApiSuccessResponse<{ submissions: Judge0Submission[] }>
     >(`api/v1/submissions/run`, {
       ...variables,
+      languageId: 1
     })
 
     return data.data.submissions
@@ -301,7 +302,6 @@ export const getProblems: QueryFunction<{
   params.set('page', page)
   params.set('limit', limit)
   tags.forEach((tag, index) => params.set(`tags[all][${index}]`, tag))
-  ;('tag[all]=100&tag[all]=105')
   if (status) params.set('status', status)
   if (difficulty) params.set('difficulty', difficulty)
   if (name) params.set('name[regex]', `(?i)${name}`)
