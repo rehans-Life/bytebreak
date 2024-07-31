@@ -35,6 +35,7 @@ jobs:
           host: ${{ secrets.VM_INSTANCE_IP }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          passphrase: ${{ secrets.PASSPHRASE }}
           source: "docker-compose.yml,./judge0/docker-compose.yml,./judge0/judge0.conf"
           target: "/home/${{ secrets.SSH_USERNAME }}/"
 
@@ -53,6 +54,7 @@ jobs:
         with:
           host: ${{ secrets.VM_INSTANCE_IP }}
           username: ${{ secrets.SSH_USERNAME }}
+          passphrase: ${{ secrets.PASSPHRASE }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           envs: PORT,DB_PASSWORD,DB_URI,JWT_SECRET_KEY,JWT_EXPIRES_IN,JWT_COOKIE_EXPIRES_IN,FIREBASE_STORAGE_URI,FRONTEND_URI,JUDGE0_API
           script: |
