@@ -2,8 +2,8 @@ import { Metadata } from 'next'
 import React, { ReactNode } from 'react'
 
 export const metadata: Metadata = {
-  title: 'Sign Up / Registetr',
-  description: 'Register into Bytebreak',
+  title: 'Sign Up / Register',
+  description: 'Register into ByteBreak',
 }
 
 export default function layout({

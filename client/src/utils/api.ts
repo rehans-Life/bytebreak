@@ -18,6 +18,7 @@ import {
   Like,
   ProblemStatus,
   Tag,
+  ProblemInsights,
 } from '../app/interfaces'
 import axios from './axios'
 import { Judge0Submission } from '@/atoms/testcaseAtoms'
@@ -314,5 +315,12 @@ export const getProblems: QueryFunction<{
   >(`api/v1/problems?${params.toString()}`, {
     signal,
   })
+  return data.data
+}
+
+export const getProblemInsights: QueryFunction<ProblemInsights> = async function () {
+  const { data } = await axios.get<ApiSuccessResponse<ProblemInsights>>(
+    `api/v1/problems/insights`
+  )
   return data.data
 }

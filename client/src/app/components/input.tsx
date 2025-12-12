@@ -8,12 +8,14 @@ export default function Input({
   inputStyles,
   labelStyles,
   placeholder,
+  type = 'text',
   ...props
 }: UseFormRegisterReturn<any> & {
   label?: string
   labelStyles?: string
   inputStyles?: string
   placeholder?: string
+  type?: string
   inputRef: RefCallBack
   ref: RefCallBack
 }) {
@@ -29,6 +31,7 @@ export default function Input({
       <input
         id={uid}
         ref={inputRef}
+        type={type}
         className={`${inputStyles} placeholder:text-dark-label-2 placeholder:text-sm bg-transparent border-dark-label-1 border focus:border-dark-layer-2 text-white rounded-md px-2 py-1.5 focus:ring-2 focus:ring-dark-ring-1`}
         onChange={props.onChange}
         onBlur={props.onBlur}

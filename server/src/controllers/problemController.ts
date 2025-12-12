@@ -209,6 +209,204 @@ export const getProblems: RequestHandler = catchAsync(async (req, res) => {
   })
 })
 
+export const getProblemInsights: RequestHandler = catchAsync(
+  async (_req, res) => {
+    const [insights] =
+      (await Problem.aggregate([
+        {
+          $facet: {
+            totals: [
+              {
+                $group: {
+                  _id: null,
+                  total: { $sum: 1 },
+                  easy: {
+                    $sum: {
+                      $cond: [{ $eq: ['$difficulty', 'easy'] }, 1, 0],
+                    },
+                  },
+                  medium: {
+                    $sum: {
+                      $cond: [{ $eq: ['$difficulty', 'medium'] }, 1, 0],
+                    },
+                  },
+                  hard: {
+                    $sum: {
+                      $cond: [{ $eq: ['$difficulty', 'hard'] }, 1, 0],
+                    },
+                  },
+                },
+              },
+              { $project: { _id: 0 } },
+            ],
+            performanceByDifficulty: [
+              {
+                $group: {
+                  _id: '$difficulty',
+                  avgAcceptance: {
+                    $avg: {
+                      $cond: [
+                        { $gt: ['$submissions', 0] },
+                        { $divide: ['$accepted', '$submissions'] },
+                        0,
+                      ],
+                    },
+                  },
+                  avgLikes: { $avg: '$likes' },
+                  avgSubmissions: { $avg: '$submissions' },
+                  total: { $sum: 1 },
+                },
+              },
+              {
+                $project: {
+                  _id: 0,
+                  difficulty: '$_id',
+                  avgAcceptance: {
+                    $round: [{ $multiply: ['$avgAcceptance', 100] }, 1],
+                  },
+                  avgLikes: { $round: ['$avgLikes', 1] },
+                  avgSubmissions: { $round: ['$avgSubmissions', 0] },
+                  total: 1,
+                },
+              },
+              { $sort: { difficulty: 1 } },
+            ],
+            topTags: [
+              { $unwind: '$tags' },
+              {
+                $group: {
+                  _id: '$tags',
+                  totalProblems: { $sum: 1 },
+                  avgAcceptance: {
+                    $avg: {
+                      $cond: [
+                        { $gt: ['$submissions', 0] },
+                        { $divide: ['$accepted', '$submissions'] },
+                        0,
+                      ],
+                    },
+                  },
+                  avgLikes: { $avg: '$likes' },
+                },
+              },
+              { $sort: { totalProblems: -1 } },
+              { $limit: 6 },
+              {
+                $lookup: {
+                  from: Tag.collection.name,
+                  localField: '_id',
+                  foreignField: '_id',
+                  as: 'tag',
+                },
+              },
+              { $unwind: '$tag' },
+              {
+                $project: {
+                  _id: 0,
+                  id: '$tag._id',
+                  name: '$tag.name',
+                  slug: '$tag.slug',
+                  totalProblems: 1,
+                  avgAcceptance: {
+                    $round: [{ $multiply: ['$avgAcceptance', 100] }, 1],
+                  },
+                  avgLikes: { $round: ['$avgLikes', 1] },
+                },
+              },
+            ],
+            topProblems: [
+              {
+                $project: {
+                  name: 1,
+                  slug: 1,
+                  likes: 1,
+                  difficulty: 1,
+                  acceptanceRate: {
+                    $cond: [
+                      { $gt: ['$submissions', 0] },
+                      {
+                        $round: [
+                          {
+                            $multiply: [
+                              { $divide: ['$accepted', '$submissions'] },
+                              100,
+                            ],
+                          },
+                          1,
+                        ],
+                      },
+                      0,
+                    ],
+                  },
+                },
+              },
+              { $sort: { likes: -1 } },
+              { $limit: 5 },
+            ],
+            monthlyAcceptance: [
+              {
+                $project: {
+                  month: {
+                    $dateToString: {
+                      date: '$createdAt',
+                      format: '%Y-%m',
+                    },
+                  },
+                  acceptance: {
+                    $cond: [
+                      { $gt: ['$submissions', 0] },
+                      { $divide: ['$accepted', '$submissions'] },
+                      0,
+                    ],
+                  },
+                },
+              },
+              {
+                $group: {
+                  _id: '$month',
+                  avgAcceptance: { $avg: '$acceptance' },
+                  count: { $sum: 1 },
+                },
+              },
+              { $sort: { _id: 1 } },
+              {
+                $project: {
+                  _id: 0,
+                  month: '$_id',
+                  avgAcceptance: {
+                    $round: [{ $multiply: ['$avgAcceptance', 100] }, 1],
+                  },
+                  count: 1,
+                },
+              },
+            ],
+          },
+        },
+        {
+          $project: {
+            totals: { $arrayElemAt: ['$totals', 0] },
+            performanceByDifficulty: 1,
+            topTags: 1,
+            topProblems: 1,
+            monthlyAcceptance: 1,
+          },
+        },
+      ])) || []
+
+    return res.status(200).json({
+      status: 'success',
+      data:
+        insights || {
+          totals: { total: 0, easy: 0, medium: 0, hard: 0 },
+          performanceByDifficulty: [],
+          topTags: [],
+          topProblems: [],
+          monthlyAcceptance: [],
+        },
+    })
+  },
+)
+
 export const createProblem: RequestHandler = catchAsync(
   async (req, res, next) => {
     let testcases: TestCases = []

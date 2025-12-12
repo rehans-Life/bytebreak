@@ -76,7 +76,7 @@ export default function GoogleButton() {
             className={`${styles.btn}  text-white text-sm hover:ring-2 focus:ring-2 ring-dark-ring-1 disabled:!ring-0 border flex items-center gap-x-2 border-dark-border !px-3 !py-2.5`}
         >
             <FcGoogle className="text-lg" />
-            Google Sign In with Google
+            Sign In with Google
         </button>
     )
 }

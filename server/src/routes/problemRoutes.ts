@@ -6,6 +6,7 @@ import {
   getDefaultConfigurations,
   getEditorial,
   parseTagsField,
+  getProblemInsights,
 } from '../controllers/problemController'
 import multer from 'multer'
 import AppError from '../utils/appError'
@@ -33,6 +34,8 @@ router
   .route('/')
   .get(setUser, ApiFeatures.formatQuery, parseTagsField, getProblems)
   .post(protect, upload.single('testcases'), createProblem)
+
+router.route('/insights').get(getProblemInsights)
 
 router.route('/:identifier').get(getProblem)
 

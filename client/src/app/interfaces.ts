@@ -115,6 +115,34 @@ export interface TagWithConfig extends LanguageTag {
   defaultConfiguration: string  
 }
 
+export interface ProblemInsights {
+  totals: { total: number; easy: number; medium: number; hard: number }
+  performanceByDifficulty: {
+    difficulty: 'easy' | 'medium' | 'hard'
+    avgAcceptance: number
+    avgLikes: number
+    avgSubmissions: number
+    total: number
+  }[]
+  topTags: {
+    id: number
+    name: string
+    slug: string
+    totalProblems: number
+    avgAcceptance: number
+    avgLikes: number
+  }[]
+  topProblems: {
+    _id: string
+    slug: string
+    name: string
+    likes: number
+    difficulty: 'easy' | 'medium' | 'hard'
+    acceptanceRate: number
+  }[]
+  monthlyAcceptance: { month: string; avgAcceptance: number; count: number }[]
+}
+
 export interface SampleTestcase {
   input: string
   output: string
