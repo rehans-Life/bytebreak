@@ -7,12 +7,12 @@ import catchAsync from '../utils/catchAsync'
 import AppError from '../utils/appError'
 
 const verifyToken = (token: string) => {
-  const secret: Secret = keys.JWT_SECRET_KEY;
+  const secret = keys.JWT_SECRET_KEY as Secret;
   return jwt.verify(token, secret)
 }
 
 const signToken = (id: string) => {
-  const secret: Secret = keys.JWT_SECRET_KEY;
+  const secret = keys.JWT_SECRET_KEY as Secret;
   const options: SignOptions = {
     expiresIn: keys.JWT_EXPIRES_IN,
   };
