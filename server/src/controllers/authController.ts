@@ -1,17 +1,22 @@
 import { CookieOptions, Request, RequestHandler, Response } from 'express'
 import User, { IUser, IUserMethods } from '../models/User'
-import jwt from 'jsonwebtoken'
+import jwt, { Secret, SignOptions } from 'jsonwebtoken'
 import keys from '../../config/keys'
 import { HydratedDocument } from 'mongoose'
 import catchAsync from '../utils/catchAsync'
 import AppError from '../utils/appError'
 
-const verifyToken = (token: string) => jwt.verify(token, keys.JWT_SECRET_KEY)
+const verifyToken = (token: string) => {
+  const secret: Secret = keys.JWT_SECRET_KEY;
+  return jwt.verify(token, secret)
+}
 
 const signToken = (id: string) => {
-  return jwt.sign({ id }, keys.JWT_SECRET_KEY, {
+  const secret: Secret = keys.JWT_SECRET_KEY;
+  const options: SignOptions = {
     expiresIn: keys.JWT_EXPIRES_IN,
-  })
+  };
+  return jwt.sign({ id }, secret, options)
 }
 
 const createSendToken = (
