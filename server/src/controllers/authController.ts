@@ -13,9 +13,9 @@ const verifyToken = (token: string) => {
 
 const signToken = (id: string) => {
   const secret = keys.JWT_SECRET_KEY as Secret;
-  const options: SignOptions = {
+  const options = {
     expiresIn: keys.JWT_EXPIRES_IN,
-  };
+  } as SignOptions;
   return jwt.sign({ id }, secret, options)
 }
 
