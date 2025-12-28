@@ -1,4 +1,4 @@
-FROM node:20.10.0-alpine as builder
+FROM node:18-alpine as builder
 
 ARG NEXT_PUBLIC_AUTH_DOMAIN
 ARG NEXT_PUBLIC_API_KEY
