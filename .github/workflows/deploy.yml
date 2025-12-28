@@ -58,9 +58,9 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           envs: PORT,DB_PASSWORD,DB_URI,JWT_SECRET_KEY,JWT_EXPIRES_IN,JWT_COOKIE_EXPIRES_IN,FIREBASE_STORAGE_URI,FRONTEND_URI,JUDGE0_API
           script: |
-            docker exec nginx-service certbot delete --cert-name defidigital.site
+            docker exec nginx-service certbot delete --cert-name bytebreak.site
             docker compose -f /home/${{ secrets.SSH_USERNAME }}/docker-compose.yml down --remove-orphans
             docker image prune -af
             docker compose -f /home/${{ secrets.SSH_USERNAME }}/docker-compose.yml pull
             docker compose -f /home/${{ secrets.SSH_USERNAME }}/docker-compose.yml up -d
-            docker exec nginx-service certbot --nginx -d defidigital.site -d www.defidigital.site --noninteractive --redirect --agree-tos --email rehantosif5@gmail.com
+            docker exec nginx-service certbot --nginx -d bytebreak.site -d www.bytebreak.site --noninteractive --redirect --agree-tos --email rehantosif5@gmail.com
