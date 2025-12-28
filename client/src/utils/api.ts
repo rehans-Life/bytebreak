@@ -26,7 +26,6 @@ import { IGoogleUser, IUser, UserInfo } from '@/atoms/userAtom'
 import { SignUpFormType } from '@/app/signup/page'
 import { LoginFormType } from '@/app/login/page'
 import createFormData from './createFormData'
-import { SignInFormType } from '@/app/social/signup/signIn'
 import { ProblemsCount, UserCalender } from '@/app/[username]/interfaces'
 
 export const getMe = async () => {
